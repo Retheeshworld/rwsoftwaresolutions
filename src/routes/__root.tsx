@@ -35,6 +35,12 @@ export const Route = createRootRoute({
       { name: "author", content: "RiseWave" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "RiseWave Software Solutions" },
+      { name: "twitter:title", content: "RiseWave Software Solutions" },
+      { property: "og:description", content: "Creating the Future with AI, Web & Automation." },
+      { name: "twitter:description", content: "Creating the Future with AI, Web & Automation." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YfCsuRg1LhhMqaG91TUIdFK32du2/social-images/social-1776859001486-RW_logo.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YfCsuRg1LhhMqaG91TUIdFK32du2/social-images/social-1776859001486-RW_logo.webp" },
     ],
     links: [
       {
