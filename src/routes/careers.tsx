@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Home, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
+import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Loader2, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/PageHero";
 import { toast } from "sonner";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/careers")({
   head: () => ({
