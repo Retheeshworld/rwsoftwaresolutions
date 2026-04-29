@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Briefcase, MapPin, Upload } from "lucide-react";
+import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Home, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,10 +42,141 @@ function CareersPage() {
   return (
     <SiteLayout>
       <PageHero
-        eyebrow="Careers"
-        title="Build the future, |with us|"
-        subtitle="Join a team that ships fast, learns faster, and treats engineering like a craft."
+        eyebrow="Careers & Internships"
+        title="Ride the wave of |innovation|"
+        subtitle="Join a team that ships fast, learns faster, and treats engineering like a craft. 100% online internships open now."
       />
+
+      {/* Internship Program */}
+      <section className="relative overflow-hidden bg-gradient-hero">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-12 max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> We're Hiring Interns
+            </span>
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl lg:text-5xl">
+              Join Our <span className="text-gradient">Internship Program</span>
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Kickstart your career with real-world experience — from anywhere. 🌐
+            </p>
+          </div>
+
+          <div className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { Icon: Globe, title: "100% Online", desc: "Work from anywhere" },
+              { Icon: Clock, title: "1 / 3 Months", desc: "Flexible duration" },
+              { Icon: Award, title: "Certificate", desc: "On completion" },
+              { Icon: Rocket, title: "Placement", desc: "Real opportunities" },
+            ].map(({ Icon, title, desc }) => (
+              <div
+                key={title}
+                className="group rounded-2xl border border-border bg-card p-5 shadow-card transition-smooth hover:-translate-y-1 hover:border-primary/40 hover:shadow-elegant"
+              >
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-brand text-white shadow-elegant transition-smooth group-hover:scale-110">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="font-semibold">{title}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-12 rounded-3xl border border-border bg-card p-6 shadow-elegant sm:p-8">
+            <h3 className="mb-6 flex items-center gap-2 text-xl font-bold sm:text-2xl">
+              <Target className="h-5 w-5 text-primary" /> Domains Available
+            </h3>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { Icon: Code2, name: "Web Development" },
+                { Icon: Smartphone, name: "App Development" },
+                { Icon: Rocket, name: "Full Stack Development" },
+                { Icon: Palette, name: "UI/UX Design" },
+                { Icon: Brain, name: "AI & Prompt Engineering" },
+                { Icon: Megaphone, name: "Digital Marketing" },
+                { Icon: Users, name: "Social Media Management" },
+                { Icon: Sparkles, name: "Content Creation" },
+              ].map(({ Icon, name }) => (
+                <div
+                  key={name}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-smooth hover:border-primary/40 hover:bg-primary/5"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium">{name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
+              <h3 className="mb-5 flex items-center gap-2 text-xl font-bold">
+                <GraduationCap className="h-5 w-5 text-primary" /> Who Can Apply?
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  "Students (Any Degree / Department)",
+                  "Freshers & Job Seekers",
+                  "Anyone passionate about learning & growth",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
+              <h3 className="mb-5 flex items-center gap-2 text-xl font-bold">
+                <Sparkles className="h-5 w-5 text-primary" /> What You'll Get
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  "Real-Time Project Experience",
+                  "Internship Certificate",
+                  "Skill Development & Mentorship",
+                  "Work From Home",
+                  "Placement Opportunity",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-10 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-brand p-6 text-white shadow-glow sm:p-8">
+            <div className="flex flex-col items-center justify-between gap-5 text-center sm:flex-row sm:text-left">
+              <div>
+                <div className="text-lg font-bold sm:text-xl">🌊 Ride the Wave of Innovation</div>
+                <div className="mt-1 text-sm text-white/80">Learn • Build • Grow • Succeed</div>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a href="https://wa.me/917604974617" target="_blank" rel="noopener noreferrer">
+                  <Button size="lg" variant="secondary" className="font-semibold">
+                    <Phone className="h-4 w-4" /> WhatsApp 7604974617
+                  </Button>
+                </a>
+                <a href="mailto:info.rwsoftwaresolutions@gmail.com">
+                  <Button size="lg" variant="outline" className="border-white/40 bg-white/10 font-semibold text-white hover:bg-white/20 hover:text-white">
+                    <Mail className="h-4 w-4" /> Email Us
+                  </Button>
+                </a>
+                <a href="#apply">
+                  <Button size="lg" className="bg-white font-semibold text-primary hover:bg-white/90">
+                    Apply Now →
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <h2 className="mb-8 text-2xl font-bold sm:text-3xl">Open Roles</h2>
