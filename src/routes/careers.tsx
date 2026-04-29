@@ -33,14 +33,98 @@ const roles = [
   { role: "Automation Engineer", type: "Contract", loc: "Remote" },
 ];
 
+const internshipDomains = [
+  "Web Development",
+  "App Development",
+  "Full Stack Development",
+  "UI/UX Design",
+  "AI & Prompt Engineering",
+  "Digital Marketing",
+  "Social Media Management",
+  "Content Creation",
+];
+
+const applicationSchema = z.object({
+  full_name: z.string().trim().min(2, "Name is too short").max(100),
+  email: z.string().trim().email("Invalid email").max(255),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  domain: z.string().min(1, "Please choose a domain"),
+  duration: z.string().min(1, "Please choose duration"),
+  message: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
 function CareersPage() {
+  const { user } = useAuth();
   const [selected, setSelected] = useState<string>("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast.success("Application received! We'll get back to you within 5 days.");
     e.currentTarget.reset();
     setSelected("");
+  };
+
+  const onInternshipSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    const parsed = applicationSchema.safeParse({
+      full_name: fd.get("i_name"),
+      email: fd.get("i_email"),
+      phone: fd.get("i_phone") ?? "",
+      domain: fd.get("i_domain"),
+      duration: fd.get("i_duration"),
+      message: fd.get("i_message") ?? "",
+    });
+
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      let resume_url: string | null = null;
+
+      if (resumeFile) {
+        if (resumeFile.size > 5 * 1024 * 1024) {
+          toast.error("Resume must be under 5MB");
+          setSubmitting(false);
+          return;
+        }
+        const ext = resumeFile.name.split(".").pop() || "pdf";
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("resumes")
+          .upload(path, resumeFile, { contentType: resumeFile.type });
+        if (upErr) throw upErr;
+        resume_url = path;
+      }
+
+      const { error } = await supabase.from("internship_applications").insert({
+        user_id: user?.id ?? null,
+        full_name: parsed.data.full_name,
+        email: parsed.data.email,
+        phone: parsed.data.phone || null,
+        domain: parsed.data.domain,
+        duration: parsed.data.duration,
+        message: parsed.data.message || null,
+        resume_url,
+      });
+      if (error) throw error;
+
+      toast.success("Application submitted! We'll be in touch soon. 🌊");
+      form.reset();
+      setResumeFile(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Submission failed. Please try again or WhatsApp us.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
