@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/rw-logo.jpeg";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const links = [
   { to: "/", label: "Home" },
@@ -45,14 +47,31 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/login" className="hidden sm:block">
-            <Button variant="ghost" size="sm">Login</Button>
-          </Link>
-          <Link to="/contact" className="hidden sm:block">
-            <Button size="sm" className="bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow">
-              Get Started
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="hidden sm:block">
+                  <Button variant="ghost" size="sm">
+                    <LayoutDashboard className="h-4 w-4" /> Admin
+                  </Button>
+                </Link>
+              )}
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden sm:flex">
+                <LogOut className="h-4 w-4" /> Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:block">
+                <Button variant="ghost" size="sm">Login</Button>
+              </Link>
+              <Link to="/contact" className="hidden sm:block">
+                <Button size="sm" className="bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
           <Button
             variant="ghost"
             size="icon"
