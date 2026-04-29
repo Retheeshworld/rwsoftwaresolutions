@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
+import { RequireAuth } from "@/components/RequireAuth";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -19,7 +20,11 @@ export const Route = createFileRoute("/admin")({
       { name: "description", content: "RiseWave admin dashboard." },
     ],
   }),
-  component: AdminPage,
+  component: () => (
+    <RequireAuth requireAdmin>
+      <AdminPage />
+    </RequireAuth>
+  ),
 });
 
 const stats = [

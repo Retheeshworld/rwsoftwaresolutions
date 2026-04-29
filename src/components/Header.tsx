@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/rw-logo.jpeg";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const links = [
   { to: "/", label: "Home" },
@@ -17,6 +19,13 @@ const links = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    setOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl">
@@ -45,14 +54,31 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/login" className="hidden sm:block">
-            <Button variant="ghost" size="sm">Login</Button>
-          </Link>
-          <Link to="/contact" className="hidden sm:block">
-            <Button size="sm" className="bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow">
-              Get Started
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="hidden sm:block">
+                  <Button variant="ghost" size="sm">
+                    <LayoutDashboard className="h-4 w-4" /> Admin
+                  </Button>
+                </Link>
+              )}
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden sm:flex">
+                <LogOut className="h-4 w-4" /> Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:block">
+                <Button variant="ghost" size="sm">Login</Button>
+              </Link>
+              <Link to="/contact" className="hidden sm:block">
+                <Button size="sm" className="bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -81,12 +107,27 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-2 flex gap-2 border-t border-border/40 pt-3">
-              <Link to="/login" onClick={() => setOpen(false)} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full">Login</Button>
-              </Link>
-              <Link to="/contact" onClick={() => setOpen(false)} className="flex-1">
-                <Button size="sm" className="w-full bg-gradient-brand text-white">Get Started</Button>
-              </Link>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setOpen(false)} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full">Admin</Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" size="sm" className="flex-1" onClick={handleSignOut}>
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">Login</Button>
+                  </Link>
+                  <Link to="/contact" onClick={() => setOpen(false)} className="flex-1">
+                    <Button size="sm" className="w-full bg-gradient-brand text-white">Get Started</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>
