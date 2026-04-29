@@ -255,7 +255,7 @@ function CareersPage() {
                     <Mail className="h-4 w-4" /> Email Us
                   </Button>
                 </a>
-                <a href="#apply">
+                <a href="#intern-apply">
                   <Button size="lg" className="bg-white font-semibold text-primary hover:bg-white/90">
                     Apply Now →
                   </Button>
@@ -263,6 +263,122 @@ function CareersPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Internship Application Form */}
+      <section id="intern-apply" className="border-t border-border/40 bg-background">
+        <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> Internship Application
+            </span>
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">
+              Apply for the <span className="text-gradient">Internship Program</span>
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Fill in the details below. Our team will review and reach out within 3–5 days.
+            </p>
+          </div>
+
+          <form
+            onSubmit={onInternshipSubmit}
+            className="space-y-5 rounded-3xl border border-border bg-card p-6 shadow-elegant sm:p-8"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="i_name">Full Name *</Label>
+                <Input id="i_name" name="i_name" required maxLength={100} placeholder="Your full name" className="mt-2" />
+              </div>
+              <div>
+                <Label htmlFor="i_email">Email *</Label>
+                <Input id="i_email" name="i_email" type="email" required maxLength={255} placeholder="you@email.com" className="mt-2" />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="i_phone">Phone / WhatsApp</Label>
+                <Input id="i_phone" name="i_phone" type="tel" maxLength={20} placeholder="+91 ..." className="mt-2" />
+              </div>
+              <div>
+                <Label htmlFor="i_duration">Duration *</Label>
+                <select
+                  id="i_duration"
+                  name="i_duration"
+                  required
+                  defaultValue=""
+                  className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="" disabled>Select duration</option>
+                  <option value="1 Month">1 Month</option>
+                  <option value="3 Months">3 Months</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="i_domain">Domain / Role *</Label>
+              <select
+                id="i_domain"
+                name="i_domain"
+                required
+                defaultValue=""
+                className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="" disabled>Select a domain</option>
+                {internshipDomains.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="i_message">Why should we pick you? (optional)</Label>
+              <Textarea
+                id="i_message"
+                name="i_message"
+                rows={4}
+                maxLength={1000}
+                placeholder="Tell us about your skills, projects, or motivation..."
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="i_resume">Resume (PDF / DOC, max 5MB)</Label>
+              <label
+                htmlFor="i_resume"
+                className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-border bg-background px-4 py-6 text-sm text-muted-foreground transition-smooth hover:border-primary hover:text-primary"
+              >
+                <Upload className="h-4 w-4" />
+                {resumeFile ? resumeFile.name : "Click to upload your resume"}
+                <input
+                  id="i_resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={submitting}
+              className="w-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow"
+            >
+              {submitting ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>
+              ) : (
+                "Submit Internship Application"
+              )}
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              By applying you agree to be contacted via email or WhatsApp regarding your application.
+            </p>
+          </form>
         </div>
       </section>
 
