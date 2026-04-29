@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Briefcase, MapPin, Upload } from "lucide-react";
+import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Home, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
