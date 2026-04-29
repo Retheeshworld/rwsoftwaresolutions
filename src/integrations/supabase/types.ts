@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      internship_applications: {
+        Row: {
+          created_at: string
+          domain: string
+          duration: string | null
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string | null
+          resume_url: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          duration?: string | null
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          duration?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          resume_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
