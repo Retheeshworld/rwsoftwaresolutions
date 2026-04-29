@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Home, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
+import { Award, Brain, Briefcase, CheckCircle2, Clock, Code2, Globe, GraduationCap, Loader2, Mail, MapPin, Megaphone, Palette, Phone, Rocket, Smartphone, Sparkles, Target, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/PageHero";
 import { toast } from "sonner";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/careers")({
   head: () => ({
@@ -29,14 +33,98 @@ const roles = [
   { role: "Automation Engineer", type: "Contract", loc: "Remote" },
 ];
 
+const internshipDomains = [
+  "Web Development",
+  "App Development",
+  "Full Stack Development",
+  "UI/UX Design",
+  "AI & Prompt Engineering",
+  "Digital Marketing",
+  "Social Media Management",
+  "Content Creation",
+];
+
+const applicationSchema = z.object({
+  full_name: z.string().trim().min(2, "Name is too short").max(100),
+  email: z.string().trim().email("Invalid email").max(255),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  domain: z.string().min(1, "Please choose a domain"),
+  duration: z.string().min(1, "Please choose duration"),
+  message: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
 function CareersPage() {
+  const { user } = useAuth();
   const [selected, setSelected] = useState<string>("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toast.success("Application received! We'll get back to you within 5 days.");
     e.currentTarget.reset();
     setSelected("");
+  };
+
+  const onInternshipSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    const parsed = applicationSchema.safeParse({
+      full_name: fd.get("i_name"),
+      email: fd.get("i_email"),
+      phone: fd.get("i_phone") ?? "",
+      domain: fd.get("i_domain"),
+      duration: fd.get("i_duration"),
+      message: fd.get("i_message") ?? "",
+    });
+
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      let resume_url: string | null = null;
+
+      if (resumeFile) {
+        if (resumeFile.size > 5 * 1024 * 1024) {
+          toast.error("Resume must be under 5MB");
+          setSubmitting(false);
+          return;
+        }
+        const ext = resumeFile.name.split(".").pop() || "pdf";
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("resumes")
+          .upload(path, resumeFile, { contentType: resumeFile.type });
+        if (upErr) throw upErr;
+        resume_url = path;
+      }
+
+      const { error } = await supabase.from("internship_applications").insert({
+        user_id: user?.id ?? null,
+        full_name: parsed.data.full_name,
+        email: parsed.data.email,
+        phone: parsed.data.phone || null,
+        domain: parsed.data.domain,
+        duration: parsed.data.duration,
+        message: parsed.data.message || null,
+        resume_url,
+      });
+      if (error) throw error;
+
+      toast.success("Application submitted! We'll be in touch soon. 🌊");
+      form.reset();
+      setResumeFile(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Submission failed. Please try again or WhatsApp us.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -167,7 +255,7 @@ function CareersPage() {
                     <Mail className="h-4 w-4" /> Email Us
                   </Button>
                 </a>
-                <a href="#apply">
+                <a href="#intern-apply">
                   <Button size="lg" className="bg-white font-semibold text-primary hover:bg-white/90">
                     Apply Now →
                   </Button>
@@ -175,6 +263,122 @@ function CareersPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Internship Application Form */}
+      <section id="intern-apply" className="border-t border-border/40 bg-background">
+        <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> Internship Application
+            </span>
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">
+              Apply for the <span className="text-gradient">Internship Program</span>
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Fill in the details below. Our team will review and reach out within 3–5 days.
+            </p>
+          </div>
+
+          <form
+            onSubmit={onInternshipSubmit}
+            className="space-y-5 rounded-3xl border border-border bg-card p-6 shadow-elegant sm:p-8"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="i_name">Full Name *</Label>
+                <Input id="i_name" name="i_name" required maxLength={100} placeholder="Your full name" className="mt-2" />
+              </div>
+              <div>
+                <Label htmlFor="i_email">Email *</Label>
+                <Input id="i_email" name="i_email" type="email" required maxLength={255} placeholder="you@email.com" className="mt-2" />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="i_phone">Phone / WhatsApp</Label>
+                <Input id="i_phone" name="i_phone" type="tel" maxLength={20} placeholder="+91 ..." className="mt-2" />
+              </div>
+              <div>
+                <Label htmlFor="i_duration">Duration *</Label>
+                <select
+                  id="i_duration"
+                  name="i_duration"
+                  required
+                  defaultValue=""
+                  className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="" disabled>Select duration</option>
+                  <option value="1 Month">1 Month</option>
+                  <option value="3 Months">3 Months</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="i_domain">Domain / Role *</Label>
+              <select
+                id="i_domain"
+                name="i_domain"
+                required
+                defaultValue=""
+                className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="" disabled>Select a domain</option>
+                {internshipDomains.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="i_message">Why should we pick you? (optional)</Label>
+              <Textarea
+                id="i_message"
+                name="i_message"
+                rows={4}
+                maxLength={1000}
+                placeholder="Tell us about your skills, projects, or motivation..."
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="i_resume">Resume (PDF / DOC, max 5MB)</Label>
+              <label
+                htmlFor="i_resume"
+                className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-border bg-background px-4 py-6 text-sm text-muted-foreground transition-smooth hover:border-primary hover:text-primary"
+              >
+                <Upload className="h-4 w-4" />
+                {resumeFile ? resumeFile.name : "Click to upload your resume"}
+                <input
+                  id="i_resume"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={submitting}
+              className="w-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow"
+            >
+              {submitting ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>
+              ) : (
+                "Submit Internship Application"
+              )}
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              By applying you agree to be contacted via email or WhatsApp regarding your application.
+            </p>
+          </form>
         </div>
       </section>
 
