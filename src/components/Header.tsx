@@ -100,12 +100,27 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-2 flex gap-2 border-t border-border/40 pt-3">
-              <Link to="/login" onClick={() => setOpen(false)} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full">Login</Button>
-              </Link>
-              <Link to="/contact" onClick={() => setOpen(false)} className="flex-1">
-                <Button size="sm" className="w-full bg-gradient-brand text-white">Get Started</Button>
-              </Link>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setOpen(false)} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full">Admin</Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" size="sm" className="flex-1" onClick={handleSignOut}>
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setOpen(false)} className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">Login</Button>
+                  </Link>
+                  <Link to="/contact" onClick={() => setOpen(false)} className="flex-1">
+                    <Button size="sm" className="w-full bg-gradient-brand text-white">Get Started</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>
