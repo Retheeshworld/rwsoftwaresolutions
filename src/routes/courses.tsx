@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Award,
   BadgeCheck,
@@ -34,6 +35,8 @@ import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/SiteLayout";
 import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchCourses, enrollInCourse, type Course as DbCourse } from "@/lib/lms";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -170,10 +173,46 @@ const pricingIncludes = [
 ];
 
 function CoursesPage() {
-  const enroll = (title: string) =>
-    toast.success(`Enrollment started for ${title}`, {
-      description: "We'll reach out on WhatsApp within minutes.",
-    });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [dbCourses, setDbCourses] = useState<DbCourse[]>([]);
+  const [enrolling, setEnrolling] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCourses().then(setDbCourses).catch(() => {});
+  }, []);
+
+  const findDbCourse = (title: string) =>
+    dbCourses.find((c) => c.title.toLowerCase() === title.toLowerCase());
+
+  const enroll = async (title: string) => {
+    if (!user) {
+      toast.info("Please sign in to enroll");
+      navigate({ to: "/login" });
+      return;
+    }
+    const dbCourse = findDbCourse(title);
+    if (!dbCourse) {
+      toast.success(`Enrollment started for ${title}`, {
+        description: "We'll reach out on WhatsApp within minutes.",
+      });
+      return;
+    }
+    setEnrolling(dbCourse.id);
+    try {
+      await enrollInCourse(dbCourse.id, user.id);
+      toast.success(`Enrolled in ${title}`);
+      navigate({
+        to: "/learn/$courseId/$lessonId",
+        params: { courseId: dbCourse.id, lessonId: "first" },
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("Enrollment failed");
+    } finally {
+      setEnrolling(null);
+    }
+  };
 
   return (
     <SiteLayout>

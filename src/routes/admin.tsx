@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Bell,
@@ -23,8 +23,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard — RiseWave" },
-      { name: "description", content: "RiseWave admin dashboard." },
+      { title: "Admin Dashboard — RW Software Solutions" },
+      { name: "description", content: "Manage courses, students, enrollments and applications." },
     ],
   }),
   component: () => (
@@ -33,13 +33,6 @@ export const Route = createFileRoute("/admin")({
     </RequireAuth>
   ),
 });
-
-const stats = [
-  { Icon: Users, label: "Total Users", value: "12,438", change: "+8.4%" },
-  { Icon: GraduationCap, label: "Active Courses", value: "24", change: "+2" },
-  { Icon: DollarSign, label: "Revenue (MTD)", value: "₹4.8L", change: "+18.2%" },
-  { Icon: TrendingUp, label: "Conversions", value: "342", change: "+12%" },
-];
 
 type Application = {
   id: string;
@@ -54,6 +47,15 @@ type Application = {
   created_at: string;
 };
 
+type EnrollmentRow = {
+  id: string;
+  enrolled_at: string;
+  amount_paid: number;
+  user_id: string;
+  course: { title: string } | null;
+  profile: { full_name: string | null; email: string | null } | null;
+};
+
 const statusColors: Record<string, string> = {
   pending: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
   reviewed: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
@@ -64,19 +66,61 @@ const statusColors: Record<string, string> = {
 function AdminPage() {
   const [apps, setApps] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    students: 0,
+    courses: 0,
+    enrollments: 0,
+    revenue: 0,
+  });
+  const [recent, setRecent] = useState<EnrollmentRow[]>([]);
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("internship_applications")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) {
-      toast.error("Failed to load applications");
-      console.error(error);
-    } else {
-      setApps((data ?? []) as Application[]);
+
+    const [
+      { data: appsData },
+      { count: studentsCount },
+      { count: coursesCount },
+      { data: enrData },
+      { data: recentEnr },
+    ] = await Promise.all([
+      supabase.from("internship_applications").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
+      supabase.from("courses").select("*", { count: "exact", head: true }),
+      supabase.from("enrollments").select("amount_paid"),
+      supabase
+        .from("enrollments")
+        .select("id, enrolled_at, amount_paid, user_id, course:courses(title)")
+        .order("enrolled_at", { ascending: false })
+        .limit(8),
+    ]);
+
+    const totalEnrollments = enrData?.length ?? 0;
+    const revenue = (enrData ?? []).reduce((sum, e) => sum + (e.amount_paid ?? 0), 0);
+
+    // hydrate profile names for recent
+    const recentList = (recentEnr ?? []) as unknown as EnrollmentRow[];
+    const userIds = [...new Set(recentList.map((r) => r.user_id))];
+    if (userIds.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", userIds);
+      const byId = new Map((profs ?? []).map((p) => [p.id, p]));
+      recentList.forEach((r) => {
+        const p = byId.get(r.user_id);
+        r.profile = p ? { full_name: p.full_name, email: p.email } : null;
+      });
     }
+
+    setApps((appsData ?? []) as Application[]);
+    setStats({
+      students: studentsCount ?? 0,
+      courses: coursesCount ?? 0,
+      enrollments: totalEnrollments,
+      revenue,
+    });
+    setRecent(recentList);
     setLoading(false);
   };
 
@@ -98,9 +142,7 @@ function AdminPage() {
   };
 
   const downloadResume = async (path: string) => {
-    const { data, error } = await supabase.storage
-      .from("resumes")
-      .createSignedUrl(path, 60);
+    const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, 60);
     if (error || !data) {
       toast.error("Couldn't open resume");
       return;
@@ -108,57 +150,55 @@ function AdminPage() {
     window.open(data.signedUrl, "_blank");
   };
 
+  const statCards = [
+    { Icon: Users, label: "Total Students", value: stats.students.toLocaleString() },
+    { Icon: BookOpen, label: "Courses", value: stats.courses.toLocaleString() },
+    { Icon: GraduationCap, label: "Enrollments", value: stats.enrollments.toLocaleString() },
+    { Icon: DollarSign, label: "Revenue", value: `₹${stats.revenue.toLocaleString()}` },
+  ];
+
   return (
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-          <aside className="rounded-2xl border border-border bg-card p-4">
+          <aside className="rounded-2xl border border-border bg-card p-4 lg:sticky lg:top-20 lg:self-start">
             <div className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Admin
             </div>
             <nav className="space-y-1">
-              {[
-                { Icon: LayoutDashboard, label: "Dashboard", active: true },
-                { Icon: Briefcase, label: "Internships" },
-                { Icon: Users, label: "Users" },
-                { Icon: BookOpen, label: "Courses" },
-                { Icon: Mail, label: "Submissions" },
-                { Icon: Bell, label: "Notifications" },
-                { Icon: Settings, label: "Settings" },
-              ].map(({ Icon, label, active }) => (
-                <button
-                  key={label}
-                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-smooth ${
-                    active
-                      ? "bg-gradient-brand text-white shadow-elegant"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" /> {label}
-                </button>
-              ))}
+              <SideLink Icon={LayoutDashboard} label="Dashboard" to="/admin" exact />
+              <SideLink Icon={BookOpen} label="Courses" to="/admin/courses" />
+              <SideLink Icon={Briefcase} label="Internships" to="/admin" anchor="#internships" />
+              <SideButton Icon={Users} label="Users" />
+              <SideButton Icon={Mail} label="Submissions" />
+              <SideButton Icon={Bell} label="Notifications" />
+              <SideButton Icon={Settings} label="Settings" />
             </nav>
           </aside>
 
           <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-bold">Dashboard</h1>
-              <p className="text-sm text-muted-foreground">
-                Welcome back. Here's what's happening today.
-              </p>
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h1 className="text-2xl font-bold">Dashboard</h1>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back. Here's what's happening with RW Software Solutions.
+                </p>
+              </div>
+              <Link to="/admin/courses">
+                <Button className="bg-gradient-brand text-white">
+                  <BookOpen className="h-4 w-4" /> Manage Courses
+                </Button>
+              </Link>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {stats.map(({ Icon, label, value, change }) => (
+              {statCards.map(({ Icon, label, value }) => (
                 <div
                   key={label}
                   className="rounded-2xl border border-border bg-gradient-card p-5 shadow-card"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <span className="text-xs font-semibold text-emerald-500">{change}</span>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                    <Icon className="h-4 w-4" />
                   </div>
                   <div className="mt-4 text-2xl font-bold">{value}</div>
                   <div className="text-xs text-muted-foreground">{label}</div>
@@ -166,8 +206,48 @@ function AdminPage() {
               ))}
             </div>
 
-            {/* Internship Applications */}
+            {/* Recent enrollments */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold">Recent enrollments</h2>
+                  <p className="text-xs text-muted-foreground">Latest students and their courses</p>
+                </div>
+                <TrendingUp className="h-4 w-4 text-emerald-500" />
+              </div>
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : recent.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No enrollments yet.</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {recent.map((r) => (
+                    <div key={r.id} className="flex flex-wrap items-center gap-3 py-3 text-sm">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                        {(r.profile?.full_name ?? r.profile?.email ?? "U")[0]?.toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-medium">
+                          {r.profile?.full_name ?? r.profile?.email ?? "Student"}
+                        </div>
+                        <div className="truncate text-xs text-muted-foreground">
+                          {r.course?.title ?? "Course"}
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        ₹{r.amount_paid.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(r.enrolled_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Internship Applications */}
+            <div id="internships" className="rounded-2xl border border-border bg-card p-6 shadow-card">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">Internship Applications</h2>
@@ -237,11 +317,7 @@ function AdminPage() {
 
                       <div className="mt-3 flex flex-wrap gap-2">
                         {a.resume_url && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => downloadResume(a.resume_url!)}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => downloadResume(a.resume_url!)}>
                             <Download className="h-3.5 w-3.5" /> Resume
                           </Button>
                         )}
@@ -280,5 +356,52 @@ function AdminPage() {
         </div>
       </div>
     </SiteLayout>
+  );
+}
+
+function SideLink({
+  Icon,
+  label,
+  to,
+  exact,
+  anchor,
+}: {
+  Icon: typeof LayoutDashboard;
+  label: string;
+  to: string;
+  exact?: boolean;
+  anchor?: string;
+}) {
+  if (anchor) {
+    return (
+      <a
+        href={anchor}
+        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-smooth hover:bg-muted hover:text-foreground"
+      >
+        <Icon className="h-4 w-4" /> {label}
+      </a>
+    );
+  }
+  return (
+    <Link
+      to={to}
+      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-smooth hover:bg-muted hover:text-foreground"
+      activeProps={{ className: "bg-gradient-brand text-white shadow-elegant hover:bg-gradient-brand hover:text-white" }}
+      activeOptions={{ exact: !!exact }}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </Link>
+  );
+}
+
+function SideButton({ Icon, label }: { Icon: typeof LayoutDashboard; label: string }) {
+  return (
+    <button
+      type="button"
+      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-smooth hover:bg-muted hover:text-foreground"
+      onClick={() => toast.info(`${label} — coming soon`)}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </button>
   );
 }
