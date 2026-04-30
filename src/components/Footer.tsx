@@ -42,8 +42,8 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold">Connect</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +91 76049 74617</li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> hello@risewave.dev</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /><span>+91 76049 74617</span></li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /><span>info.rwsoftwaresolutions@gmail.com</span></li>
             </ul>
             <div className="mt-4 flex gap-3">
               {[
