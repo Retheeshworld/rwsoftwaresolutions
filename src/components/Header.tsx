@@ -56,11 +56,14 @@ export function Header() {
           <ThemeToggle />
           {user ? (
             <>
+              <Link to="/dashboard" className="hidden sm:block">
+                <Button variant="ghost" size="sm">
+                  <LayoutDashboard className="h-4 w-4" /> My Learning
+                </Button>
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="hidden sm:block">
-                  <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="h-4 w-4" /> Admin
-                  </Button>
+                  <Button variant="ghost" size="sm">Admin</Button>
                 </Link>
               )}
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden sm:flex">
