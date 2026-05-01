@@ -36,7 +36,8 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchCourses, enrollInCourse, type Course as DbCourse } from "@/lib/lms";
+import { fetchCourses, type Course as DbCourse } from "@/lib/lms";
+import { PaymentDialog } from "@/components/PaymentDialog";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -176,7 +177,10 @@ function CoursesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dbCourses, setDbCourses] = useState<DbCourse[]>([]);
-  const [enrolling, setEnrolling] = useState<string | null>(null);
+  const [paymentFor, setPaymentFor] = useState<{
+    course: DbCourse;
+    title: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchCourses().then(setDbCourses).catch(() => {});
@@ -191,31 +195,38 @@ function CoursesPage() {
       navigate({ to: "/login" });
       return;
     }
-    const dbCourse = findDbCourse(title);
+    const dbCourse = findDbCourse(title) ?? dbCourses[0];
     if (!dbCourse) {
-      toast.success(`Enrollment started for ${title}`, {
-        description: "We'll reach out on WhatsApp within minutes.",
-      });
+      toast.info("Courses are loading — please try again in a second.");
       return;
     }
-    setEnrolling(dbCourse.id);
-    try {
-      await enrollInCourse(dbCourse.id, user.id);
-      toast.success(`Enrolled in ${title}`);
+    setPaymentFor({ course: dbCourse, title });
+  };
+
+  const handlePaymentSuccess = () => {
+    if (!paymentFor) return;
+    const courseId = paymentFor.course.id;
+    toast.success(`Enrolled in ${paymentFor.title}`);
+    // Brief delay so the success state is visible before redirect
+    setTimeout(() => {
       navigate({
         to: "/learn/$courseId/$lessonId",
-        params: { courseId: dbCourse.id, lessonId: "first" },
+        params: { courseId, lessonId: "first" },
       });
-    } catch (e) {
-      console.error(e);
-      toast.error("Enrollment failed");
-    } finally {
-      setEnrolling(null);
-    }
+    }, 1200);
   };
 
   return (
     <SiteLayout>
+      <PaymentDialog
+        open={!!paymentFor}
+        onOpenChange={(v) => !v && setPaymentFor(null)}
+        courseId={paymentFor?.course.id ?? null}
+        courseTitle={paymentFor?.title ?? ""}
+        amount={paymentFor?.course.price ?? 999}
+        userId={user?.id ?? null}
+        onSuccess={handlePaymentSuccess}
+      />
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-hero">
         <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
@@ -573,7 +584,8 @@ function CoursesPage() {
               href="mailto:info.rwsoftwaresolutions@gmail.com"
               className="mt-2 inline-flex items-center gap-2 text-muted-foreground transition-smooth hover:text-foreground"
             >
-              <Mail className="h-4 w-4" /> info.rwsoftwaresolutions@gmail.com
+              <Mail className="h-4 w-4" />
+              <span>info.rwsoftwaresolutions@gmail.com</span>
             </a>
           </div>
           <div>
