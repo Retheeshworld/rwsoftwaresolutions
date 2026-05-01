@@ -218,6 +218,15 @@ function CoursesPage() {
 
   return (
     <SiteLayout>
+      <PaymentDialog
+        open={!!paymentFor}
+        onOpenChange={(v) => !v && setPaymentFor(null)}
+        courseId={paymentFor?.course.id ?? null}
+        courseTitle={paymentFor?.title ?? ""}
+        amount={paymentFor?.course.price ?? 999}
+        userId={user?.id ?? null}
+        onSuccess={handlePaymentSuccess}
+      />
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-hero">
         <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
