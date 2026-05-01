@@ -54,7 +54,10 @@ function LearnPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingComplete, setSavingComplete] = useState(false);
+  const [resumePosition, setResumePosition] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSavedRef = useRef<number>(0);
+  const hasSeekedRef = useRef<boolean>(false);
 
   // Load course + tree + enrollment + progress
   useEffect(() => {
@@ -78,7 +81,7 @@ function LearnPage() {
         if (lessonIds.length) {
           const { data: prog } = await supabase
             .from("lesson_progress")
-            .select("lesson_id, completed")
+            .select("lesson_id, completed, last_position_seconds")
             .eq("user_id", user.id)
             .in("lesson_id", lessonIds);
           if (active) {
@@ -139,6 +142,91 @@ function LearnPage() {
       active = false;
     };
   }, [activeLesson, enrolled]);
+
+  // Fetch resume position whenever active lesson changes
+  useEffect(() => {
+    hasSeekedRef.current = false;
+    setResumePosition(0);
+    if (!user || !activeLesson) return;
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("lesson_progress")
+        .select("last_position_seconds, completed")
+        .eq("user_id", user.id)
+        .eq("lesson_id", activeLesson.id)
+        .maybeSingle();
+      if (!active) return;
+      const pos = data?.last_position_seconds ?? 0;
+      // Don't resume if already completed or near the end
+      if (pos > 5 && !data?.completed) {
+        setResumePosition(pos);
+        lastSavedRef.current = pos;
+      } else {
+        lastSavedRef.current = 0;
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [user, activeLesson]);
+
+  // Save current playback position
+  const savePosition = async (seconds: number, opts?: { force?: boolean }) => {
+    if (!user || !activeLesson) return;
+    const rounded = Math.floor(seconds);
+    if (!opts?.force && Math.abs(rounded - lastSavedRef.current) < 5) return;
+    lastSavedRef.current = rounded;
+    await supabase.from("lesson_progress").upsert(
+      {
+        user_id: user.id,
+        lesson_id: activeLesson.id,
+        last_position_seconds: rounded,
+        completed: completedSet.has(activeLesson.id),
+      },
+      { onConflict: "user_id,lesson_id" },
+    );
+  };
+
+  // Wire up auto-save + resume on the video element
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoUrl) return;
+
+    const onLoadedMeta = () => {
+      if (!hasSeekedRef.current && resumePosition > 0 && resumePosition < video.duration - 2) {
+        try {
+          video.currentTime = resumePosition;
+          toast.info(`Resumed from ${Math.floor(resumePosition / 60)}:${String(Math.floor(resumePosition % 60)).padStart(2, "0")}`);
+        } catch {}
+        hasSeekedRef.current = true;
+      }
+    };
+    const onTimeUpdate = () => savePosition(video.currentTime);
+    const onPause = () => savePosition(video.currentTime, { force: true });
+    const onEnded = () => savePosition(video.currentTime, { force: true });
+
+    video.addEventListener("loadedmetadata", onLoadedMeta);
+    video.addEventListener("timeupdate", onTimeUpdate);
+    video.addEventListener("pause", onPause);
+    video.addEventListener("ended", onEnded);
+
+    const onBeforeUnload = () => {
+      if (video.currentTime > 0) savePosition(video.currentTime, { force: true });
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+
+    return () => {
+      video.removeEventListener("loadedmetadata", onLoadedMeta);
+      video.removeEventListener("timeupdate", onTimeUpdate);
+      video.removeEventListener("pause", onPause);
+      video.removeEventListener("ended", onEnded);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      // Final save on unmount / lesson change
+      if (video.currentTime > 0) savePosition(video.currentTime, { force: true });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [videoUrl, resumePosition, activeLesson?.id, user?.id]);
 
   const markComplete = async () => {
     if (!user || !activeLesson) return;
