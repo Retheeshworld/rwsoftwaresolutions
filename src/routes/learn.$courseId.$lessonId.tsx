@@ -81,7 +81,7 @@ function LearnPage() {
         if (lessonIds.length) {
           const { data: prog } = await supabase
             .from("lesson_progress")
-            .select("lesson_id, completed")
+            .select("lesson_id, completed, last_position_seconds")
             .eq("user_id", user.id)
             .in("lesson_id", lessonIds);
           if (active) {
