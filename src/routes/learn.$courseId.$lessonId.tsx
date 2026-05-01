@@ -54,7 +54,10 @@ function LearnPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [savingComplete, setSavingComplete] = useState(false);
+  const [resumePosition, setResumePosition] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSavedRef = useRef<number>(0);
+  const hasSeekedRef = useRef<boolean>(false);
 
   // Load course + tree + enrollment + progress
   useEffect(() => {
