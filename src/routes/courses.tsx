@@ -36,7 +36,8 @@ import { SiteLayout } from "@/components/SiteLayout";
 import { toast } from "sonner";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchCourses, enrollInCourse, type Course as DbCourse } from "@/lib/lms";
+import { fetchCourses, type Course as DbCourse } from "@/lib/lms";
+import { PaymentDialog } from "@/components/PaymentDialog";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
