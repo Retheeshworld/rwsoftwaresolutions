@@ -177,7 +177,10 @@ function CoursesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [dbCourses, setDbCourses] = useState<DbCourse[]>([]);
-  const [enrolling, setEnrolling] = useState<string | null>(null);
+  const [paymentFor, setPaymentFor] = useState<{
+    course: DbCourse;
+    title: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchCourses().then(setDbCourses).catch(() => {});
@@ -192,27 +195,25 @@ function CoursesPage() {
       navigate({ to: "/login" });
       return;
     }
-    const dbCourse = findDbCourse(title);
+    const dbCourse = findDbCourse(title) ?? dbCourses[0];
     if (!dbCourse) {
-      toast.success(`Enrollment started for ${title}`, {
-        description: "We'll reach out on WhatsApp within minutes.",
-      });
+      toast.info("Courses are loading — please try again in a second.");
       return;
     }
-    setEnrolling(dbCourse.id);
-    try {
-      await enrollInCourse(dbCourse.id, user.id);
-      toast.success(`Enrolled in ${title}`);
+    setPaymentFor({ course: dbCourse, title });
+  };
+
+  const handlePaymentSuccess = () => {
+    if (!paymentFor) return;
+    const courseId = paymentFor.course.id;
+    toast.success(`Enrolled in ${paymentFor.title}`);
+    // Brief delay so the success state is visible before redirect
+    setTimeout(() => {
       navigate({
         to: "/learn/$courseId/$lessonId",
-        params: { courseId: dbCourse.id, lessonId: "first" },
+        params: { courseId, lessonId: "first" },
       });
-    } catch (e) {
-      console.error(e);
-      toast.error("Enrollment failed");
-    } finally {
-      setEnrolling(null);
-    }
+    }, 1200);
   };
 
   return (
