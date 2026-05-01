@@ -584,7 +584,8 @@ function CoursesPage() {
               href="mailto:info.rwsoftwaresolutions@gmail.com"
               className="mt-2 inline-flex items-center gap-2 text-muted-foreground transition-smooth hover:text-foreground"
             >
-              <Mail className="h-4 w-4" /> info.rwsoftwaresolutions@gmail.com
+              <Mail className="h-4 w-4" />
+              <span>info.rwsoftwaresolutions@gmail.com</span>
             </a>
           </div>
           <div>
