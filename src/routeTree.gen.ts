@@ -21,7 +21,13 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CertificateCertIdRouteImport } from './routes/certificate.$certId'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminInternshipsRouteImport } from './routes/admin.internships'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
+import { Route as AdminContactRouteImport } from './routes/admin.contact'
+import { Route as AdminCertificatesRouteImport } from './routes/admin.certificates'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LearnCourseIdLessonIdRouteImport } from './routes/learn.$courseId.$lessonId'
 import { Route as AdminCoursesCourseIdRouteImport } from './routes/admin.courses.$courseId'
 
@@ -85,9 +91,39 @@ const CertificateCertIdRoute = CertificateCertIdRouteImport.update({
   path: '/certificate/$certId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInternshipsRoute = AdminInternshipsRouteImport.update({
+  id: '/internships',
+  path: '/internships',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCoursesRoute = AdminCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminContactRoute = AdminContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCertificatesRoute = AdminCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const LearnCourseIdLessonIdRoute = LearnCourseIdLessonIdRouteImport.update({
@@ -113,7 +149,13 @@ export interface FileRoutesByFullPath {
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
+  '/admin/internships': typeof AdminInternshipsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -130,7 +172,13 @@ export interface FileRoutesByTo {
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
+  '/admin/internships': typeof AdminInternshipsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -148,7 +196,13 @@ export interface FileRoutesById {
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
+  '/admin/internships': typeof AdminInternshipsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -167,7 +221,13 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/services'
     | '/signup'
+    | '/admin/analytics'
+    | '/admin/certificates'
+    | '/admin/contact'
     | '/admin/courses'
+    | '/admin/internships'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -184,7 +244,13 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/services'
     | '/signup'
+    | '/admin/analytics'
+    | '/admin/certificates'
+    | '/admin/contact'
     | '/admin/courses'
+    | '/admin/internships'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -201,7 +267,13 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/services'
     | '/signup'
+    | '/admin/analytics'
+    | '/admin/certificates'
+    | '/admin/contact'
     | '/admin/courses'
+    | '/admin/internships'
+    | '/admin/payments'
+    | '/admin/settings'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -309,11 +381,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CertificateCertIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/internships': {
+      id: '/admin/internships'
+      path: '/internships'
+      fullPath: '/admin/internships'
+      preLoaderRoute: typeof AdminInternshipsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/courses': {
       id: '/admin/courses'
       path: '/courses'
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/contact': {
+      id: '/admin/contact'
+      path: '/contact'
+      fullPath: '/admin/contact'
+      preLoaderRoute: typeof AdminContactRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/certificates': {
+      id: '/admin/certificates'
+      path: '/certificates'
+      fullPath: '/admin/certificates'
+      preLoaderRoute: typeof AdminCertificatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/learn/$courseId/$lessonId': {
@@ -346,11 +460,23 @@ const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminCertificatesRoute: typeof AdminCertificatesRoute
+  AdminContactRoute: typeof AdminContactRoute
   AdminCoursesRoute: typeof AdminCoursesRouteWithChildren
+  AdminInternshipsRoute: typeof AdminInternshipsRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminCertificatesRoute: AdminCertificatesRoute,
+  AdminContactRoute: AdminContactRoute,
   AdminCoursesRoute: AdminCoursesRouteWithChildren,
+  AdminInternshipsRoute: AdminInternshipsRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
