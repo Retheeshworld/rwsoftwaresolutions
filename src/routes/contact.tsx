@@ -116,23 +116,23 @@ function ContactPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label htmlFor="cname">Name</Label>
-                <Input id="cname" required placeholder="Your full name" className="mt-2" />
+                <Input id="cname" name="name" required maxLength={100} placeholder="Your full name" className="mt-2" />
               </div>
               <div>
                 <Label htmlFor="cemail">Email</Label>
-                <Input id="cemail" type="email" required placeholder="you@email.com" className="mt-2" />
+                <Input id="cemail" name="email" type="email" required maxLength={255} placeholder="you@email.com" className="mt-2" />
               </div>
             </div>
             <div>
               <Label htmlFor="csubject">Subject</Label>
-              <Input id="csubject" placeholder="What's this about?" className="mt-2" />
+              <Input id="csubject" name="subject" maxLength={200} placeholder="What's this about?" className="mt-2" />
             </div>
             <div>
               <Label htmlFor="cmsg">Message</Label>
-              <Textarea id="cmsg" required rows={6} placeholder="Tell us about your project..." className="mt-2" />
+              <Textarea id="cmsg" name="message" required maxLength={2000} rows={6} placeholder="Tell us about your project..." className="mt-2" />
             </div>
-            <Button type="submit" size="lg" className="w-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow sm:w-auto">
-              Send Message <Send className="ml-1 h-4 w-4" />
+            <Button type="submit" size="lg" disabled={submitting} className="w-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:shadow-glow sm:w-auto">
+              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Send Message <Send className="ml-1 h-4 w-4" /></>}
             </Button>
           </form>
         </div>
