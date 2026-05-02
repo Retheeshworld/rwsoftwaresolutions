@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
-import { SiteLayout } from "@/components/SiteLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RequireAuth } from "@/components/RequireAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,8 +86,8 @@ function AdminCoursesPage() {
   };
 
   return (
-    <SiteLayout>
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <AdminLayout>
+      <div className="mx-auto w-full max-w-7xl">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <Link to="/admin" className="text-xs text-muted-foreground hover:text-foreground">
@@ -169,6 +169,6 @@ function AdminCoursesPage() {
           </div>
         )}
       </div>
-    </SiteLayout>
+    </AdminLayout>
   );
 }
