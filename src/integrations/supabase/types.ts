@@ -100,6 +100,8 @@ export type Database = {
           course_id: string
           enrolled_at: string
           id: string
+          payment_method: string
+          payment_reference: string | null
           payment_status: string
           status: string
           user_id: string
@@ -109,6 +111,8 @@ export type Database = {
           course_id: string
           enrolled_at?: string
           id?: string
+          payment_method?: string
+          payment_reference?: string | null
           payment_status?: string
           status?: string
           user_id: string
@@ -118,6 +122,8 @@ export type Database = {
           course_id?: string
           enrolled_at?: string
           id?: string
+          payment_method?: string
+          payment_reference?: string | null
           payment_status?: string
           status?: string
           user_id?: string
