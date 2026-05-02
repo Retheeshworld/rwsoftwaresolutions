@@ -9,7 +9,7 @@ import {
   Upload,
   Video,
 } from "lucide-react";
-import { SiteLayout } from "@/components/SiteLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RequireAuth } from "@/components/RequireAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,29 +106,29 @@ function EditCoursePage() {
 
   if (loading) {
     return (
-      <SiteLayout>
+      <AdminLayout>
         <div className="flex min-h-[60vh] items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
-      </SiteLayout>
+      </AdminLayout>
     );
   }
 
   if (!course) {
     return (
-      <SiteLayout>
+      <AdminLayout>
         <div className="mx-auto max-w-xl px-4 py-20 text-center">
           <h1 className="text-2xl font-bold">Course not found</h1>
           <Link to="/admin/courses" className="mt-4 inline-block">
             <Button variant="outline">Back to courses</Button>
           </Link>
         </div>
-      </SiteLayout>
+      </AdminLayout>
     );
   }
 
   return (
-    <SiteLayout>
+    <AdminLayout>
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <Link to="/admin/courses" className="text-xs text-muted-foreground hover:text-foreground">
           ← Courses
@@ -240,7 +240,7 @@ function EditCoursePage() {
           )}
         </div>
       </div>
-    </SiteLayout>
+    </AdminLayout>
   );
 }
 
