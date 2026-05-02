@@ -169,6 +169,6 @@ function AdminCoursesPage() {
           </div>
         )}
       </div>
-    </SiteLayout>
+    </AdminLayout>
   );
 }
