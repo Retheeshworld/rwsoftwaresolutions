@@ -15,6 +15,7 @@ import {
   Moon,
   Search,
   Settings,
+  Share2,
   Sparkles,
   Sun,
   X,
@@ -41,6 +42,7 @@ const NAV: NavItem[] = [
   { to: "/admin/certificates", label: "Certificates", Icon: Award },
   { to: "/admin/contact", label: "Inbox", Icon: Mail },
   { to: "/admin/analytics", label: "Analytics", Icon: LineChart },
+  { to: "/admin/social", label: "Social Media", Icon: Share2 },
   { to: "/admin/settings", label: "Settings", Icon: Settings },
 ];
 
