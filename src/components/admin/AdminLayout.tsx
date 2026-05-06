@@ -18,6 +18,7 @@ import {
   Share2,
   Sparkles,
   Sun,
+  Users,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
