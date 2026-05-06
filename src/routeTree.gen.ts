@@ -27,6 +27,7 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminInternshipsRouteImport } from './routes/admin.internships'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminContactRouteImport } from './routes/admin.contact'
+import { Route as AdminClientsRouteImport } from './routes/admin.clients'
 import { Route as AdminCertificatesRouteImport } from './routes/admin.certificates'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LearnCourseIdLessonIdRouteImport } from './routes/learn.$courseId.$lessonId'
@@ -122,6 +123,11 @@ const AdminContactRoute = AdminContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClientsRoute = AdminClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCertificatesRoute = AdminCertificatesRouteImport.update({
   id: '/certificates',
   path: '/certificates',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/internships': typeof AdminInternshipsRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/internships': typeof AdminInternshipsRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
+  '/admin/clients': typeof AdminClientsRoute
   '/admin/contact': typeof AdminContactRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/internships': typeof AdminInternshipsRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/analytics'
     | '/admin/certificates'
+    | '/admin/clients'
     | '/admin/contact'
     | '/admin/courses'
     | '/admin/internships'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/analytics'
     | '/admin/certificates'
+    | '/admin/clients'
     | '/admin/contact'
     | '/admin/courses'
     | '/admin/internships'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin/analytics'
     | '/admin/certificates'
+    | '/admin/clients'
     | '/admin/contact'
     | '/admin/courses'
     | '/admin/internships'
@@ -435,6 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/clients': {
+      id: '/admin/clients'
+      path: '/clients'
+      fullPath: '/admin/clients'
+      preLoaderRoute: typeof AdminClientsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/certificates': {
       id: '/admin/certificates'
       path: '/certificates'
@@ -481,6 +500,7 @@ const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminCertificatesRoute: typeof AdminCertificatesRoute
+  AdminClientsRoute: typeof AdminClientsRoute
   AdminContactRoute: typeof AdminContactRoute
   AdminCoursesRoute: typeof AdminCoursesRouteWithChildren
   AdminInternshipsRoute: typeof AdminInternshipsRoute
@@ -492,6 +512,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminCertificatesRoute: AdminCertificatesRoute,
+  AdminClientsRoute: AdminClientsRoute,
   AdminContactRoute: AdminContactRoute,
   AdminCoursesRoute: AdminCoursesRouteWithChildren,
   AdminInternshipsRoute: AdminInternshipsRoute,
