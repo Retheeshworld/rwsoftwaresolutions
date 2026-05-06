@@ -15,6 +15,7 @@ import {
   Moon,
   Search,
   Settings,
+  Share2,
   Sparkles,
   Sun,
   X,
