@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CertificateCertIdRouteImport } from './routes/certificate.$certId'
+import { Route as AdminSocialRouteImport } from './routes/admin.social'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminInternshipsRouteImport } from './routes/admin.internships'
@@ -91,6 +92,11 @@ const CertificateCertIdRoute = CertificateCertIdRouteImport.update({
   path: '/certificate/$certId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSocialRoute = AdminSocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/admin/internships': typeof AdminInternshipsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/admin/internships': typeof AdminInternshipsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/admin/internships': typeof AdminInternshipsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/internships'
     | '/admin/payments'
     | '/admin/settings'
+    | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin/internships'
     | '/admin/payments'
     | '/admin/settings'
+    | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/admin/internships'
     | '/admin/payments'
     | '/admin/settings'
+    | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
@@ -381,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CertificateCertIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/social': {
+      id: '/admin/social'
+      path: '/social'
+      fullPath: '/admin/social'
+      preLoaderRoute: typeof AdminSocialRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -467,6 +486,7 @@ interface AdminRouteChildren {
   AdminInternshipsRoute: typeof AdminInternshipsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSocialRoute: typeof AdminSocialRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -477,6 +497,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInternshipsRoute: AdminInternshipsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSocialRoute: AdminSocialRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
