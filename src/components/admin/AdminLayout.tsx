@@ -36,6 +36,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
+  { to: "/admin/clients", label: "Clients", Icon: Users },
   { to: "/admin/courses", label: "Courses", Icon: BookOpen },
   { to: "/admin/internships", label: "Internships", Icon: Briefcase },
   { to: "/admin/payments", label: "Payments", Icon: CreditCard },
