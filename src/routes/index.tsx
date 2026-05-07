@@ -257,6 +257,9 @@ function HomePage() {
         </div>
       </section>
 
+      {/* LinkedIn feed */}
+      <LinkedInFeed />
+
       {/* Internship CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-brand p-10 text-center text-white shadow-elegant sm:p-16">
