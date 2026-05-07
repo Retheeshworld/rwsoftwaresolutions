@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/SiteLayout";
 import { SectionHeader } from "@/components/SectionHeader";
+import { LinkedInFeed } from "@/components/LinkedInFeed";
 import logo from "@/assets/rw-logo.jpeg";
 
 export const Route = createFileRoute("/")({
@@ -255,6 +256,9 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* LinkedIn feed */}
+      <LinkedInFeed />
 
       {/* Internship CTA */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
