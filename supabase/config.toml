@@ -1,1 +1,4 @@
 project_id = "seawwsetbxstnfmdycnr"
+
+[functions.rw-chat]
+verify_jwt = false
