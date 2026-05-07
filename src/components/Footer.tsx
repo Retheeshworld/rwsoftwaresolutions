@@ -48,7 +48,7 @@ export function Footer() {
             <div className="mt-4 flex gap-3">
               {[
                 { Icon: Twitter, href: "#" },
-                { Icon: Linkedin, href: "#" },
+                { Icon: Linkedin, href: "https://www.linkedin.com/company/rw-software-solutions-60230a405" },
                 { Icon: Github, href: "#" },
                 { Icon: Instagram, href: "#" },
               ].map(({ Icon, href }, i) => (

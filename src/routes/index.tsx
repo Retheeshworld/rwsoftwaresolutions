@@ -57,9 +57,9 @@ const why = [
 ];
 
 const stats = [
-  { v: "120+", l: "Projects Delivered" },
+  { v: "50+", l: "Projects Delivered" },
   { v: "50+", l: "Startup Clients" },
-  { v: "10K+", l: "Students Trained" },
+  { v: "100+", l: "Students Trained" },
   { v: "98%", l: "Satisfaction" },
 ];
 
