@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/SiteLayout";
 import { SectionHeader } from "@/components/SectionHeader";
+import { LinkedInFeed } from "@/components/LinkedInFeed";
 import logo from "@/assets/rw-logo.jpeg";
 
 export const Route = createFileRoute("/")({
