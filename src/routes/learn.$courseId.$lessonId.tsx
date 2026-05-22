@@ -478,12 +478,43 @@ function LearnPage() {
                     {moduleLessons.length === 0 && (
                       <div className="px-2 py-1 text-xs text-muted-foreground/70">No lessons yet</div>
                     )}
+                    {quizzes.filter((q) => q.module_id === m.id && !q.is_final).map((q) => (
+                      <Link
+                        key={q.id}
+                        to="/learn/$courseId/quiz/$quizId"
+                        params={{ courseId, quizId: q.id }}
+                        className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-muted-foreground transition-smooth hover:bg-muted hover:text-foreground"
+                      >
+                        {passedQuizIds.has(q.id) ? (
+                          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                        ) : (
+                          <Circle className="h-4 w-4 shrink-0" />
+                        )}
+                        <span className="line-clamp-1">📝 {q.title}</span>
+                      </Link>
+                    ))}
                   </div>
                 </div>
               );
             })}
+            {quizzes.filter((q) => q.is_final).map((q) => (
+              <Link
+                key={q.id}
+                to="/learn/$courseId/quiz/$quizId"
+                params={{ courseId, quizId: q.id }}
+                className="flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-2 py-2 text-sm font-medium transition-smooth hover:bg-primary/10"
+              >
+                {passedQuizIds.has(q.id) ? (
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                ) : (
+                  <Circle className="h-4 w-4 shrink-0 text-primary" />
+                )}
+                <span className="line-clamp-1">🏆 {q.title}</span>
+              </Link>
+            ))}
           </div>
         </aside>
+
       </div>
     </SiteLayout>
   );
