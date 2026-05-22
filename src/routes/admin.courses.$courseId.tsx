@@ -239,10 +239,118 @@ function EditCoursePage() {
             </div>
           )}
         </div>
+
+        <QuizzesSection courseId={courseId} modules={modules} />
       </div>
     </AdminLayout>
   );
 }
+
+function QuizzesSection({ courseId, modules }: { courseId: string; modules: Module[] }) {
+  const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; module_id: string | null; is_final: boolean; is_published: boolean; pass_percentage: number }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("quizzes")
+      .select("id,title,module_id,is_final,is_published,pass_percentage")
+      .eq("course_id", courseId)
+      .order("position", { ascending: true });
+    setQuizzes((data ?? []) as typeof quizzes);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, [courseId]);
+
+  const createQuiz = async (opts: { moduleId: string | null; isFinal: boolean }) => {
+    const { data, error } = await supabase
+      .from("quizzes")
+      .insert({
+        course_id: courseId,
+        module_id: opts.moduleId,
+        title: opts.isFinal ? "Final assessment" : "Module quiz",
+        is_final: opts.isFinal,
+        pass_percentage: 70,
+        position: quizzes.length,
+      })
+      .select()
+      .maybeSingle();
+    if (error || !data) return toast.error("Could not create quiz");
+    toast.success("Quiz created");
+    load();
+  };
+
+  const finalQuiz = quizzes.find((q) => q.is_final);
+
+  return (
+    <>
+      <h2 className="mt-10 text-lg font-bold">Quizzes & Assessments</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Add a quiz per module and one final assessment. Students must pass the final to earn a certificate.
+      </p>
+
+      {loading ? (
+        <div className="mt-4 flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          {/* Final quiz */}
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4">
+            <span className="rounded-full bg-gradient-brand px-2.5 py-0.5 text-xs font-semibold text-white">FINAL</span>
+            {finalQuiz ? (
+              <>
+                <span className="font-medium">{finalQuiz.title}</span>
+                <span className="text-xs text-muted-foreground">Pass {finalQuiz.pass_percentage}% · {finalQuiz.is_published ? "Published" : "Draft"}</span>
+                <Link
+                  to="/admin/courses/$courseId/quiz/$quizId"
+                  params={{ courseId, quizId: finalQuiz.id }}
+                  className="ml-auto"
+                >
+                  <Button size="sm" variant="outline">Edit</Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className="text-sm text-muted-foreground">No final assessment yet</span>
+                <Button size="sm" className="ml-auto bg-gradient-brand text-white" onClick={() => createQuiz({ moduleId: null, isFinal: true })}>
+                  <Plus className="h-3.5 w-3.5" /> Create final quiz
+                </Button>
+              </>
+            )}
+          </div>
+
+          {/* Module quizzes */}
+          {modules.map((m) => {
+            const mQuiz = quizzes.find((q) => q.module_id === m.id && !q.is_final);
+            return (
+              <div key={m.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4">
+                <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">MODULE</span>
+                <span className="text-sm font-medium">{m.title}</span>
+                {mQuiz ? (
+                  <>
+                    <span className="text-xs text-muted-foreground">{mQuiz.title} · Pass {mQuiz.pass_percentage}%</span>
+                    <Link
+                      to="/admin/courses/$courseId/quiz/$quizId"
+                      params={{ courseId, quizId: mQuiz.id }}
+                      className="ml-auto"
+                    >
+                      <Button size="sm" variant="outline">Edit</Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Button size="sm" variant="outline" className="ml-auto" onClick={() => createQuiz({ moduleId: m.id, isFinal: false })}>
+                    <Plus className="h-3.5 w-3.5" /> Add quiz
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}
+
 
 function ModuleEditor({
   module,
