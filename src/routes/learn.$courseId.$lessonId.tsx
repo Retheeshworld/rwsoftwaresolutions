@@ -91,6 +91,24 @@ function LearnPage() {
             setCompletedSet(new Set((prog ?? []).filter((p) => p.completed).map((p) => p.lesson_id)));
           }
         }
+
+        const { data: qz } = await supabase
+          .from("quizzes")
+          .select("id,title,module_id,is_final")
+          .eq("course_id", courseId)
+          .eq("is_published", true)
+          .order("position", { ascending: true });
+        const quizList = (qz ?? []) as Array<{ id: string; title: string; module_id: string | null; is_final: boolean }>;
+        if (active) setQuizzes(quizList);
+        if (quizList.length) {
+          const { data: atts } = await supabase
+            .from("quiz_attempts")
+            .select("quiz_id, passed")
+            .eq("user_id", user.id)
+            .in("quiz_id", quizList.map((q) => q.id));
+          if (active) setPassedQuizIds(new Set((atts ?? []).filter((a) => a.passed).map((a) => a.quiz_id)));
+        }
+
       } catch (err) {
         console.error(err);
         toast.error("Could not load course");
