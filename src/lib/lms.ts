@@ -143,3 +143,104 @@ export function probeVideoFile(file: File): Promise<number> {
 export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime", "video/webm"];
 export const MAX_VIDEO_SECONDS = 30 * 60;
 export const MAX_VIDEO_BYTES = 500 * 1024 * 1024; // 500 MB
+
+// ============ QUIZZES ============
+export type Quiz = {
+  id: string;
+  course_id: string;
+  module_id: string | null;
+  title: string;
+  description: string | null;
+  pass_percentage: number;
+  time_limit_minutes: number | null;
+  is_final: boolean;
+  is_published: boolean;
+  position: number;
+};
+
+export type QuizQuestion = {
+  id: string;
+  quiz_id: string;
+  question: string;
+  options: string[];
+  correct_index: number;
+  points: number;
+  position: number;
+};
+
+export type StudentQuestion = {
+  q_id: string;
+  q_question: string;
+  q_options: string[];
+  q_points: number;
+  q_position: number;
+};
+
+export type QuizAttempt = {
+  id: string;
+  quiz_id: string;
+  user_id: string;
+  score: number;
+  total: number;
+  percentage: number;
+  passed: boolean;
+  created_at: string;
+};
+
+type RpcClient = {
+  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
+export async function fetchCourseQuizzes(courseId: string) {
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("course_id", courseId)
+    .order("position", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as Quiz[];
+}
+
+export async function fetchQuiz(quizId: string) {
+  const { data, error } = await supabase.from("quizzes").select("*").eq("id", quizId).maybeSingle();
+  if (error) throw error;
+  return data as Quiz | null;
+}
+
+export async function fetchQuizQuestionsAdmin(quizId: string) {
+  const { data, error } = await supabase
+    .from("quiz_questions")
+    .select("*")
+    .eq("quiz_id", quizId)
+    .order("position", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as QuizQuestion[];
+}
+
+export async function fetchQuizQuestionsForStudent(quizId: string): Promise<StudentQuestion[]> {
+  const client = supabase as unknown as RpcClient;
+  const { data, error } = await client.rpc("get_quiz_questions", { _quiz_id: quizId });
+  if (error) throw new Error(error.message);
+  return (data as StudentQuestion[] | null) ?? [];
+}
+
+export async function submitQuizAttempt(quizId: string, answers: Record<string, number>) {
+  const client = supabase as unknown as RpcClient;
+  const { data, error } = await client.rpc("submit_quiz_attempt", { _quiz_id: quizId, _answers: answers });
+  if (error) throw new Error(error.message);
+  const row = (data as { attempt_id: string; score: number; total: number; percentage: number; passed: boolean }[] | null)?.[0];
+  return row;
+}
+
+export async function fetchUserAttempts(userId: string, quizIds: string[]) {
+  if (!quizIds.length) return [] as QuizAttempt[];
+  const { data, error } = await supabase
+    .from("quiz_attempts")
+    .select("*")
+    .eq("user_id", userId)
+    .in("quiz_id", quizIds)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as QuizAttempt[];
+}
+
