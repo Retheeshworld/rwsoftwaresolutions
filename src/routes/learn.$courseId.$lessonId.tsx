@@ -55,9 +55,12 @@ function LearnPage() {
   const [loading, setLoading] = useState(true);
   const [savingComplete, setSavingComplete] = useState(false);
   const [resumePosition, setResumePosition] = useState<number>(0);
+  const [quizzes, setQuizzes] = useState<Array<{ id: string; title: string; module_id: string | null; is_final: boolean }>>([]);
+  const [passedQuizIds, setPassedQuizIds] = useState<Set<string>>(new Set());
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastSavedRef = useRef<number>(0);
   const hasSeekedRef = useRef<boolean>(false);
+
 
   // Load course + tree + enrollment + progress
   useEffect(() => {
