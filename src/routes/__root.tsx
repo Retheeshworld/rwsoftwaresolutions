@@ -42,6 +42,7 @@ export const Route = createRootRoute({
       { name: "twitter:description", content: "Creating the Future with AI, Web & Automation." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YfCsuRg1LhhMqaG91TUIdFK32du2/social-images/social-1776859001486-RW_logo.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/YfCsuRg1LhhMqaG91TUIdFK32du2/social-images/social-1776859001486-RW_logo.webp" },
+      { name: "google-site-verification", content: "whVjZ2bp8j1WKb82vz6xIM5_usxg3-FFy5hw_AXbVQE" },
     ],
     links: [
       {
