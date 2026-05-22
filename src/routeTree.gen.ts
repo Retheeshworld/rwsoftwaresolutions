@@ -33,6 +33,8 @@ import { Route as AdminCertificatesRouteImport } from './routes/admin.certificat
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LearnCourseIdLessonIdRouteImport } from './routes/learn.$courseId.$lessonId'
 import { Route as AdminCoursesCourseIdRouteImport } from './routes/admin.courses.$courseId'
+import { Route as LearnCourseIdQuizQuizIdRouteImport } from './routes/learn.$courseId.quiz.$quizId'
+import { Route as AdminCoursesCourseIdQuizQuizIdRouteImport } from './routes/admin.courses.$courseId.quiz.$quizId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -154,6 +156,17 @@ const AdminCoursesCourseIdRoute = AdminCoursesCourseIdRouteImport.update({
   path: '/$courseId',
   getParentRoute: () => AdminCoursesRoute,
 } as any)
+const LearnCourseIdQuizQuizIdRoute = LearnCourseIdQuizQuizIdRouteImport.update({
+  id: '/learn/$courseId/quiz/$quizId',
+  path: '/learn/$courseId/quiz/$quizId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesCourseIdQuizQuizIdRoute =
+  AdminCoursesCourseIdQuizQuizIdRouteImport.update({
+    id: '/quiz/$quizId',
+    path: '/quiz/$quizId',
+    getParentRoute: () => AdminCoursesCourseIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -178,8 +191,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
-  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
+  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
+  '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
+  '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -204,8 +219,10 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
-  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
+  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
+  '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
+  '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -231,8 +248,10 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
-  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRoute
+  '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
+  '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
+  '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -261,6 +280,8 @@ export interface FileRouteTypes {
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
+    | '/learn/$courseId/quiz/$quizId'
+    | '/admin/courses/$courseId/quiz/$quizId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -287,6 +308,8 @@ export interface FileRouteTypes {
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
+    | '/learn/$courseId/quiz/$quizId'
+    | '/admin/courses/$courseId/quiz/$quizId'
   id:
     | '__root__'
     | '/'
@@ -313,6 +336,8 @@ export interface FileRouteTypes {
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
     | '/learn/$courseId/$lessonId'
+    | '/learn/$courseId/quiz/$quizId'
+    | '/admin/courses/$courseId/quiz/$quizId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -330,6 +355,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CertificateCertIdRoute: typeof CertificateCertIdRoute
   LearnCourseIdLessonIdRoute: typeof LearnCourseIdLessonIdRoute
+  LearnCourseIdQuizQuizIdRoute: typeof LearnCourseIdQuizQuizIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -502,15 +528,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesCourseIdRouteImport
       parentRoute: typeof AdminCoursesRoute
     }
+    '/learn/$courseId/quiz/$quizId': {
+      id: '/learn/$courseId/quiz/$quizId'
+      path: '/learn/$courseId/quiz/$quizId'
+      fullPath: '/learn/$courseId/quiz/$quizId'
+      preLoaderRoute: typeof LearnCourseIdQuizQuizIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses/$courseId/quiz/$quizId': {
+      id: '/admin/courses/$courseId/quiz/$quizId'
+      path: '/quiz/$quizId'
+      fullPath: '/admin/courses/$courseId/quiz/$quizId'
+      preLoaderRoute: typeof AdminCoursesCourseIdQuizQuizIdRouteImport
+      parentRoute: typeof AdminCoursesCourseIdRoute
+    }
   }
 }
 
+interface AdminCoursesCourseIdRouteChildren {
+  AdminCoursesCourseIdQuizQuizIdRoute: typeof AdminCoursesCourseIdQuizQuizIdRoute
+}
+
+const AdminCoursesCourseIdRouteChildren: AdminCoursesCourseIdRouteChildren = {
+  AdminCoursesCourseIdQuizQuizIdRoute: AdminCoursesCourseIdQuizQuizIdRoute,
+}
+
+const AdminCoursesCourseIdRouteWithChildren =
+  AdminCoursesCourseIdRoute._addFileChildren(AdminCoursesCourseIdRouteChildren)
+
 interface AdminCoursesRouteChildren {
-  AdminCoursesCourseIdRoute: typeof AdminCoursesCourseIdRoute
+  AdminCoursesCourseIdRoute: typeof AdminCoursesCourseIdRouteWithChildren
 }
 
 const AdminCoursesRouteChildren: AdminCoursesRouteChildren = {
-  AdminCoursesCourseIdRoute: AdminCoursesCourseIdRoute,
+  AdminCoursesCourseIdRoute: AdminCoursesCourseIdRouteWithChildren,
 }
 
 const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
@@ -558,6 +609,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CertificateCertIdRoute: CertificateCertIdRoute,
   LearnCourseIdLessonIdRoute: LearnCourseIdLessonIdRoute,
+  LearnCourseIdQuizQuizIdRoute: LearnCourseIdQuizQuizIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
