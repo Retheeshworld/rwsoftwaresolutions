@@ -90,19 +90,25 @@ function CareersPage() {
       let resume_url: string | null = null;
 
       if (resumeFile) {
+        if (!user) {
+          toast.error("Please sign in to upload a resume.");
+          setSubmitting(false);
+          return;
+        }
         if (resumeFile.size > 5 * 1024 * 1024) {
           toast.error("Resume must be under 5MB");
           setSubmitting(false);
           return;
         }
         const ext = resumeFile.name.split(".").pop() || "pdf";
-        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("resumes")
           .upload(path, resumeFile, { contentType: resumeFile.type });
         if (upErr) throw upErr;
         resume_url = path;
       }
+
 
       const { error } = await supabase.from("internship_applications").insert({
         user_id: user?.id ?? null,
