@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, Sparkles, X, Loader2 } from "lucide-react";
+import { MessageCircle, Send, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import rwLogo from "@/assets/rw-logo.jpg.asset.json";
 
 const WHATSAPP = "917604974617";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rw-chat`;
