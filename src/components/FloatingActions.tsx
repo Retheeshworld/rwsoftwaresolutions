@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, Sparkles, X, Loader2 } from "lucide-react";
+import { MessageCircle, Send, X, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import rwLogo from "@/assets/rw-logo.jpg.asset.json";
 
 const WHATSAPP = "917604974617";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rw-chat`;
@@ -115,7 +116,7 @@ export function FloatingActions() {
         <div className="fixed bottom-24 right-5 z-50 w-[92vw] max-w-sm overflow-hidden rounded-2xl border border-border bg-card shadow-elegant animate-fade-up">
           <div className="flex items-center justify-between bg-gradient-brand px-4 py-3 text-white">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
+              <img src={rwLogo.url} alt="RiseWave" className="h-7 w-7 rounded-full bg-white object-contain p-0.5 shadow-sm" />
               <div className="leading-tight">
                 <div className="text-sm font-semibold">RW Chat Assistant</div>
                 <div className="text-[10px] opacity-80">Building Innovation Through Technology</div>
@@ -172,9 +173,10 @@ export function FloatingActions() {
         <button
           onClick={() => setChatOpen((v) => !v)}
           aria-label="RW Chat Assistant"
-          className="group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:scale-110 hover:shadow-glow"
+          className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-white p-1.5 shadow-elegant ring-2 ring-primary/30 transition-smooth hover:scale-110 hover:shadow-glow hover:ring-primary"
         >
-          <Sparkles className="h-6 w-6 transition-smooth group-hover:rotate-12" />
+          <img src={rwLogo.url} alt="RW Assistant" className="h-full w-full rounded-full object-contain" />
+          <span className="absolute -top-1 -right-1 flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" /><span className="relative inline-flex h-3 w-3 rounded-full bg-primary" /></span>
         </button>
         <a
           href={`https://wa.me/${WHATSAPP}`}
