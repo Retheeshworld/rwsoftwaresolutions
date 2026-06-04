@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Eye, Heart, Rocket, Target, Users } from "lucide-react";
+import { Award, Brain, Code2, Eye, Globe, GraduationCap, Heart, Lightbulb, Mail, Rocket, Target, User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/PageHero";
@@ -33,9 +33,9 @@ function AboutPage() {
         subtitle="RiseWave was born from a simple belief: software should compound human ambition. We build it that way."
       />
 
-      {/* Founder */}
+      {/* About Retheesh R */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
+        <div className="grid items-start gap-10 lg:grid-cols-2">
           <div className="relative">
             <div className="absolute inset-0 rounded-3xl bg-gradient-brand opacity-30 blur-3xl" />
             <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gradient-brand shadow-elegant">
@@ -52,22 +52,31 @@ function AboutPage() {
           </div>
           <div>
             <span className="inline-block rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              Founder
+              About the Founder
             </span>
-            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">Retheesh R — CEO</h2>
-            <p className="mt-4 text-muted-foreground">
-              An engineer-turned-entrepreneur with a singular mission: to help India's next
-              generation of founders and developers ship products that matter. Retheesh leads
-              RiseWave's product, engineering and education teams.
+            <h2 className="mt-4 text-3xl font-bold sm:text-4xl">Retheesh R</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              Retheesh R is an entrepreneur, software developer, and AI enthusiast dedicated to
+              building innovative digital solutions. He is currently pursuing a Bachelor of Science
+              in Artificial Intelligence and Machine Learning at Rathinam Group of Institutions,
+              Coimbatore.
             </p>
-            <p className="mt-3 text-muted-foreground">
-              "We don't believe in average. Every line of code, every pixel, every product —
-              must move the needle."
+            <p className="mt-3 text-muted-foreground leading-relaxed">
+              As the CEO and Co-Founder of RW Group, Retheesh focuses on developing
+              technology-driven solutions through RW Software Development and RW Education
+              Service. His interests include Artificial Intelligence, Machine Learning, Web
+              Development, Software Engineering, and Business Innovation.
             </p>
-            <div className="mt-6 flex gap-3">
-              <Link to="/contact">
-                <Button className="bg-gradient-brand text-white">Get in touch</Button>
-              </Link>
+            <p className="mt-3 text-muted-foreground leading-relaxed">
+              With a passion for technology and entrepreneurship, he aims to create impactful
+              software products that help businesses and individuals succeed in the digital world.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="mailto:retheeshworld86@gmail.com">
+                <Button className="bg-gradient-brand text-white">
+                  <Mail className="mr-2 h-4 w-4" /> Contact
+                </Button>
+              </a>
               <Link to="/services">
                 <Button variant="outline">What we do</Button>
               </Link>
@@ -76,27 +85,80 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Vision & Mission */}
+      {/* Skills & Education */}
       <section className="bg-gradient-hero">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <SectionHeader title="Vision & |Mission|" subtitle="What gets us out of bed every morning." />
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
+            {/* Skills */}
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              <Eye className="h-8 w-8 text-primary" />
-              <h3 className="mt-4 text-2xl font-bold">Vision</h3>
-              <p className="mt-3 text-muted-foreground">
-                To be the launchpad for a million ambitious founders and engineers — building
-                AI-first products from India for the world.
-              </p>
+              <Lightbulb className="h-8 w-8 text-primary" />
+              <h3 className="mt-4 text-2xl font-bold">Skills</h3>
+              <ul className="mt-6 space-y-3">
+                {[
+                  { Icon: Brain, label: "Artificial Intelligence & Machine Learning" },
+                  { Icon: Code2, label: "Python Programming" },
+                  { Icon: Globe, label: "Web Development" },
+                  { Icon: User, label: "Software Development" },
+                  { Icon: Rocket, label: "Business Development" },
+                  { Icon: Users, label: "Leadership & Communication" },
+                ].map(({ Icon, label }) => (
+                  <li key={label} className="flex items-center gap-3">
+                    <Icon className="h-5 w-5 shrink-0 text-primary" />
+                    <span className="text-muted-foreground">{label}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
+
+            {/* Education */}
             <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              <Target className="h-8 w-8 text-primary" />
-              <h3 className="mt-4 text-2xl font-bold">Mission</h3>
-              <p className="mt-3 text-muted-foreground">
-                Deliver exceptional software, train world-class talent, and democratize access
-                to modern AI & engineering practices.
-              </p>
+              <GraduationCap className="h-8 w-8 text-primary" />
+              <h3 className="mt-4 text-2xl font-bold">Education</h3>
+              <div className="mt-6 rounded-xl border border-border bg-gradient-card p-6">
+                <div className="text-sm font-semibold text-primary">Bachelor of Science</div>
+                <h4 className="mt-1 text-lg font-semibold">Artificial Intelligence & Machine Learning</h4>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Rathinam Group of Institutions, Coimbatore
+                </p>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision & Motto */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <SectionHeader title="Vision & |Motto|" subtitle="What drives us forward every single day." />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-border bg-gradient-card p-8 shadow-card">
+            <Eye className="h-8 w-8 text-primary" />
+            <h3 className="mt-4 text-2xl font-bold">Vision</h3>
+            <p className="mt-3 text-muted-foreground">
+              To build innovative technology solutions and establish RW Group as a trusted
+              global technology company.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-gradient-card p-8 shadow-card">
+            <Target className="h-8 w-8 text-primary" />
+            <h3 className="mt-4 text-2xl font-bold">Motto</h3>
+            <p className="mt-3 text-lg font-semibold text-primary">
+              "Transforming Ideas into Digital Innovation."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission */}
+      <section className="bg-gradient-hero">
+        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <SectionHeader title="Our |Mission|" subtitle="What gets us out of bed every morning." />
+          <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 shadow-card">
+            <Target className="mx-auto h-8 w-8 text-primary" />
+            <h3 className="mt-4 text-center text-2xl font-bold">Mission</h3>
+            <p className="mt-3 text-center text-muted-foreground">
+              Deliver exceptional software, train world-class talent, and democratize access
+              to modern AI & engineering practices.
+            </p>
           </div>
         </div>
       </section>
