@@ -116,7 +116,7 @@ export function FloatingActions() {
         <div className="fixed bottom-24 right-5 z-50 w-[92vw] max-w-sm overflow-hidden rounded-2xl border border-border bg-card shadow-elegant animate-fade-up">
           <div className="flex items-center justify-between bg-gradient-brand px-4 py-3 text-white">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
+              <img src={rwLogo.url} alt="RiseWave" className="h-7 w-7 rounded-full bg-white object-contain p-0.5 shadow-sm" />
               <div className="leading-tight">
                 <div className="text-sm font-semibold">RW Chat Assistant</div>
                 <div className="text-[10px] opacity-80">Building Innovation Through Technology</div>
