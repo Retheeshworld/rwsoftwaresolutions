@@ -148,27 +148,17 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Vision & Mission */}
+      {/* Mission */}
       <section className="bg-gradient-hero">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <SectionHeader title="Vision & |Mission|" subtitle="What gets us out of bed every morning." />
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              <Eye className="h-8 w-8 text-primary" />
-              <h3 className="mt-4 text-2xl font-bold">Vision</h3>
-              <p className="mt-3 text-muted-foreground">
-                To be the launchpad for a million ambitious founders and engineers — building
-                AI-first products from India for the world.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-card">
-              <Target className="h-8 w-8 text-primary" />
-              <h3 className="mt-4 text-2xl font-bold">Mission</h3>
-              <p className="mt-3 text-muted-foreground">
-                Deliver exceptional software, train world-class talent, and democratize access
-                to modern AI & engineering practices.
-              </p>
-            </div>
+          <SectionHeader title="Our |Mission|" subtitle="What gets us out of bed every morning." />
+          <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 shadow-card">
+            <Target className="mx-auto h-8 w-8 text-primary" />
+            <h3 className="mt-4 text-center text-2xl font-bold">Mission</h3>
+            <p className="mt-3 text-center text-muted-foreground">
+              Deliver exceptional software, train world-class talent, and democratize access
+              to modern AI & engineering practices.
+            </p>
           </div>
         </div>
       </section>
