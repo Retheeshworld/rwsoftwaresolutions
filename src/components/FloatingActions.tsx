@@ -173,9 +173,10 @@ export function FloatingActions() {
         <button
           onClick={() => setChatOpen((v) => !v)}
           aria-label="RW Chat Assistant"
-          className="group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-brand text-white shadow-elegant transition-smooth hover:scale-110 hover:shadow-glow"
+          className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-white p-1.5 shadow-elegant ring-2 ring-primary/30 transition-smooth hover:scale-110 hover:shadow-glow hover:ring-primary"
         >
-          <Sparkles className="h-6 w-6 transition-smooth group-hover:rotate-12" />
+          <img src={rwLogo.url} alt="RW Assistant" className="h-full w-full rounded-full object-contain" />
+          <span className="absolute -top-1 -right-1 flex h-3 w-3"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" /><span className="relative inline-flex h-3 w-3 rounded-full bg-primary" /></span>
         </button>
         <a
           href={`https://wa.me/${WHATSAPP}`}
