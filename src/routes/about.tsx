@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, Eye, Heart, Rocket, Target, Users } from "lucide-react";
+import { Award, Brain, Code2, Eye, Globe, GraduationCap, Heart, Lightbulb, Mail, Rocket, Target, User, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/SiteLayout";
 import { PageHero } from "@/components/PageHero";
