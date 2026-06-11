@@ -220,6 +220,53 @@ function AnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
       </div>
+
+      <div>
+        <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
+        <p className="mt-1 text-sm text-muted-foreground">WhatsApp clicks, chat opens, and contact submissions.</p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ChartCard title="Lead events trend" subtitle="Last 12 months">
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={leadEvents}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12, fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Bar dataKey="whatsapp" name="WhatsApp" stackId="a" fill="var(--color-chart-1)" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="chat" name="Chat" stackId="a" fill="var(--color-chart-3)" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="contact" name="Contact" stackId="a" fill="var(--color-chart-4)" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Lead sources" subtitle="All time">
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={leadTotals}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+              >
+                {leadTotals.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12, fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
     </div>
   );
 }
