@@ -43,15 +43,18 @@ function AnalyticsPage() {
   const [growth, setGrowth] = useState<{ month: string; students: number }[]>([]);
   const [coursePop, setCoursePop] = useState<{ name: string; value: number }[]>([]);
   const [appStatus, setAppStatus] = useState<{ name: string; value: number }[]>([]);
+  const [leadEvents, setLeadEvents] = useState<{ month: string; whatsapp: number; chat: number; contact: number }[]>([]);
+  const [leadTotals, setLeadTotals] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      const [{ data: enrollments }, { data: profiles }, { data: apps }] = await Promise.all([
+      const [{ data: enrollments }, { data: profiles }, { data: apps }, { data: leads }] = await Promise.all([
         supabase
           .from("enrollments")
           .select("amount_paid, enrolled_at, course:courses(title)"),
         supabase.from("profiles").select("created_at"),
         supabase.from("internship_applications").select("status"),
+        supabase.from("lead_events").select("event_type, created_at"),
       ]);
 
       // 12-month revenue + enrollments
@@ -110,6 +113,35 @@ function AnalyticsPage() {
         sCounts.set(a.status, (sCounts.get(a.status) ?? 0) + 1);
       });
       setAppStatus([...sCounts.entries()].map(([name, value]) => ({ name, value })));
+
+      // Lead events by month
+      const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
+      }
+      const lTotals = new Map<string, number>();
+      (leads ?? []).forEach((l: any) => {
+        const d = new Date(l.created_at);
+        const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
+        if (diff >= 0 && diff < 12) {
+          const bucket = lMonths[11 - diff];
+          if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
+          else if (l.event_type === "chat_open") bucket.chat += 1;
+          else if (l.event_type === "contact_submit") bucket.contact += 1;
+        }
+        lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+      });
+      setLeadEvents(lMonths);
+      setLeadTotals(
+        [...lTotals.entries()]
+          .map(([name, value]) => ({
+            name: name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
+            value,
+          }))
+          .sort((a, b) => b.value - a.value),
+      );
     };
     load();
   }, []);
@@ -179,6 +211,53 @@ function AnalyticsPage() {
                 paddingAngle={2}
               >
                 {appStatus.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12, fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
+        <p className="mt-1 text-sm text-muted-foreground">WhatsApp clicks, chat opens, and contact submissions.</p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ChartCard title="Lead events trend" subtitle="Last 12 months">
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={leadEvents}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 12, fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Bar dataKey="whatsapp" name="WhatsApp" stackId="a" fill="var(--color-chart-1)" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="chat" name="Chat" stackId="a" fill="var(--color-chart-3)" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="contact" name="Contact" stackId="a" fill="var(--color-chart-4)" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Lead sources" subtitle="All time">
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={leadTotals}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+              >
+                {leadTotals.map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
