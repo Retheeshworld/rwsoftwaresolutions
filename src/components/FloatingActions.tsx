@@ -11,6 +11,20 @@ import { supabase } from "@/integrations/supabase/client";
 const WHATSAPP = "917604974617";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rw-chat`;
 
+async function trackLeadEvent(eventType: "whatsapp_click" | "chat_open") {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    await supabase.from("lead_events").insert({
+      event_type: eventType,
+      source_url: typeof window !== "undefined" ? window.location.href : null,
+      user_id: session?.user?.id ?? null,
+      metadata: { user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null },
+    });
+  } catch {
+    // Silently fail — tracking should never block the user
+  }
+}
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 const GREETING: Msg = {
