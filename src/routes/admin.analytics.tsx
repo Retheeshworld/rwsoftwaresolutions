@@ -48,12 +48,13 @@ function AnalyticsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [{ data: enrollments }, { data: profiles }, { data: apps }] = await Promise.all([
+      const [{ data: enrollments }, { data: profiles }, { data: apps }, { data: leads }] = await Promise.all([
         supabase
           .from("enrollments")
           .select("amount_paid, enrolled_at, course:courses(title)"),
         supabase.from("profiles").select("created_at"),
         supabase.from("internship_applications").select("status"),
+        supabase.from("lead_events").select("event_type, created_at"),
       ]);
 
       // 12-month revenue + enrollments
