@@ -43,6 +43,8 @@ function AnalyticsPage() {
   const [growth, setGrowth] = useState<{ month: string; students: number }[]>([]);
   const [coursePop, setCoursePop] = useState<{ name: string; value: number }[]>([]);
   const [appStatus, setAppStatus] = useState<{ name: string; value: number }[]>([]);
+  const [leadEvents, setLeadEvents] = useState<{ month: string; whatsapp: number; chat: number; contact: number }[]>([]);
+  const [leadTotals, setLeadTotals] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     const load = async () => {
