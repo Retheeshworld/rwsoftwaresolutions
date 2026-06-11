@@ -113,6 +113,35 @@ function AnalyticsPage() {
         sCounts.set(a.status, (sCounts.get(a.status) ?? 0) + 1);
       });
       setAppStatus([...sCounts.entries()].map(([name, value]) => ({ name, value })));
+
+      // Lead events by month
+      const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
+      }
+      const lTotals = new Map<string, number>();
+      (leads ?? []).forEach((l: any) => {
+        const d = new Date(l.created_at);
+        const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
+        if (diff >= 0 && diff < 12) {
+          const bucket = lMonths[11 - diff];
+          if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
+          else if (l.event_type === "chat_open") bucket.chat += 1;
+          else if (l.event_type === "contact_submit") bucket.contact += 1;
+        }
+        lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+      });
+      setLeadEvents(lMonths);
+      setLeadTotals(
+        [...lTotals.entries()]
+          .map(([name, value]) => ({
+            name: name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
+            value,
+          }))
+          .sort((a, b) => b.value - a.value),
+      );
     };
     load();
   }, []);
