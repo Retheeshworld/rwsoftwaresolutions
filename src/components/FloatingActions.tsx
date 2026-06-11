@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import rwLogo from "@/assets/rw-logo.jpg.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 
 const WHATSAPP = "917604974617";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rw-chat`;
