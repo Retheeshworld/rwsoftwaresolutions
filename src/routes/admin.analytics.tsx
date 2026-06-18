@@ -41,13 +41,24 @@ const COLORS = [
   "var(--color-chart-5)",
 ];
 
+type RawLead = {
+  event_type: string;
+  created_at: string;
+  device: string;
+  browser: string;
+  country: string;
+};
+
 function AnalyticsPage() {
   const [revenueByMonth, setRevenueByMonth] = useState<{ month: string; revenue: number; enrollments: number }[]>([]);
   const [growth, setGrowth] = useState<{ month: string; students: number }[]>([]);
   const [coursePop, setCoursePop] = useState<{ name: string; value: number }[]>([]);
   const [appStatus, setAppStatus] = useState<{ name: string; value: number }[]>([]);
-  const [leadEvents, setLeadEvents] = useState<{ month: string; whatsapp: number; chat: number; contact: number }[]>([]);
-  const [leadTotals, setLeadTotals] = useState<{ name: string; value: number }[]>([]);
+  const [rawLeads, setRawLeads] = useState<RawLead[]>([]);
+
+  const [deviceFilter, setDeviceFilter] = useState<string>("all");
+  const [browserFilter, setBrowserFilter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
 
   useEffect(() => {
     const load = async () => {
@@ -57,7 +68,7 @@ function AnalyticsPage() {
           .select("amount_paid, enrolled_at, course:courses(title)"),
         supabase.from("profiles").select("created_at"),
         supabase.from("internship_applications").select("status"),
-        supabase.from("lead_events").select("event_type, created_at"),
+        supabase.from("lead_events").select("event_type, created_at, metadata"),
       ]);
 
       // 12-month revenue + enrollments
@@ -117,37 +128,68 @@ function AnalyticsPage() {
       });
       setAppStatus([...sCounts.entries()].map(([name, value]) => ({ name, value })));
 
-      // Lead events by month
-      const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
-      for (let i = 11; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - i);
-        lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
-      }
-      const lTotals = new Map<string, number>();
-      (leads ?? []).forEach((l: any) => {
-        const d = new Date(l.created_at);
-        const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
-        if (diff >= 0 && diff < 12) {
-          const bucket = lMonths[11 - diff];
-          if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
-          else if (l.event_type === "chat_open") bucket.chat += 1;
-          else if (l.event_type === "contact_submit") bucket.contact += 1;
-        }
-        lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+      // Raw leads with parsed audience attributes
+      const raw: RawLead[] = (leads ?? []).map((l: any) => {
+        const m = (l.metadata ?? {}) as Record<string, unknown>;
+        return {
+          event_type: l.event_type,
+          created_at: l.created_at,
+          device: (m.device as string) || "Unknown",
+          browser: (m.browser as string) || "Unknown",
+          country: (m.country as string) || "Unknown",
+        };
       });
-      setLeadEvents(lMonths);
-      setLeadTotals(
-        [...lTotals.entries()]
-          .map(([name, value]) => ({
-            name: name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
-            value,
-          }))
-          .sort((a, b) => b.value - a.value),
-      );
+      setRawLeads(raw);
     };
     load();
   }, []);
+
+  const deviceOptions = useMemo(() => uniq(rawLeads.map((l) => l.device)), [rawLeads]);
+  const browserOptions = useMemo(() => uniq(rawLeads.map((l) => l.browser)), [rawLeads]);
+  const countryOptions = useMemo(() => uniq(rawLeads.map((l) => l.country)), [rawLeads]);
+
+  const filteredLeads = useMemo(
+    () =>
+      rawLeads.filter(
+        (l) =>
+          (deviceFilter === "all" || l.device === deviceFilter) &&
+          (browserFilter === "all" || l.browser === browserFilter) &&
+          (countryFilter === "all" || l.country === countryFilter),
+      ),
+    [rawLeads, deviceFilter, browserFilter, countryFilter],
+  );
+
+  const { leadEvents, leadTotals } = useMemo(() => {
+    const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
+    }
+    const lTotals = new Map<string, number>();
+    filteredLeads.forEach((l) => {
+      const d = new Date(l.created_at);
+      const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
+      if (diff >= 0 && diff < 12) {
+        const bucket = lMonths[11 - diff];
+        if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
+        else if (l.event_type === "chat_open") bucket.chat += 1;
+        else if (l.event_type === "contact_submit") bucket.contact += 1;
+      }
+      lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+    });
+    return {
+      leadEvents: lMonths,
+      leadTotals: [...lTotals.entries()]
+        .map(([name, value]) => ({
+          name:
+            name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
+          value,
+        }))
+        .sort((a, b) => b.value - a.value),
+    };
+  }, [filteredLeads]);
+
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
