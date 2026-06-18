@@ -266,10 +266,38 @@ function AnalyticsPage() {
         </ChartCard>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
-        <p className="mt-1 text-sm text-muted-foreground">WhatsApp clicks, chat opens, and contact submissions.</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            WhatsApp clicks, chat opens, and contact submissions.
+            {filteredLeads.length !== rawLeads.length && (
+              <span className="ml-1 text-foreground">
+                Showing {filteredLeads.length} of {rawLeads.length} events.
+              </span>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <FilterSelect label="Device" value={deviceFilter} onChange={setDeviceFilter} options={deviceOptions} />
+          <FilterSelect label="Browser" value={browserFilter} onChange={setBrowserFilter} options={browserOptions} />
+          <FilterSelect label="Country" value={countryFilter} onChange={setCountryFilter} options={countryOptions} />
+          {(deviceFilter !== "all" || browserFilter !== "all" || countryFilter !== "all") && (
+            <button
+              type="button"
+              onClick={() => {
+                setDeviceFilter("all");
+                setBrowserFilter("all");
+                setCountryFilter("all");
+              }}
+              className="rounded-md border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              Reset
+            </button>
+          )}
+        </div>
       </div>
+
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartCard title="Lead events trend" subtitle="Last 12 months">
