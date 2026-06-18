@@ -11,14 +11,51 @@ import { supabase } from "@/integrations/supabase/client";
 const WHATSAPP = "917604974617";
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rw-chat`;
 
+function parseUserAgent(ua: string): { device: string; browser: string } {
+  const isTablet = /iPad|Tablet/i.test(ua);
+  const isMobile = /Mobi|Android|iPhone|iPod/i.test(ua) && !isTablet;
+  const device = isTablet ? "Tablet" : isMobile ? "Mobile" : "Desktop";
+  let browser = "Other";
+  if (/Edg\//.test(ua)) browser = "Edge";
+  else if (/OPR\/|Opera/.test(ua)) browser = "Opera";
+  else if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser = "Chrome";
+  else if (/Firefox\//.test(ua)) browser = "Firefox";
+  else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) browser = "Safari";
+  return { device, browser };
+}
+
+let cachedCountry: string | null = null;
+async function getCountry(): Promise<string | null> {
+  if (cachedCountry !== null) return cachedCountry;
+  try {
+    const stored = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("rw_country") : null;
+    if (stored) {
+      cachedCountry = stored;
+      return stored;
+    }
+    const resp = await fetch("https://ipapi.co/json/");
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const country = data?.country_name ?? null;
+    if (country && typeof sessionStorage !== "undefined") sessionStorage.setItem("rw_country", country);
+    cachedCountry = country;
+    return country;
+  } catch {
+    return null;
+  }
+}
+
 async function trackLeadEvent(eventType: "whatsapp_click" | "chat_open") {
   try {
     const { data: { session } } = await supabase.auth.getSession();
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    const { device, browser } = parseUserAgent(ua);
+    const country = await getCountry();
     await supabase.from("lead_events").insert({
       event_type: eventType,
       source_url: typeof window !== "undefined" ? window.location.href : null,
       user_id: session?.user?.id ?? null,
-      metadata: { user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null },
+      metadata: { user_agent: ua || null, device, browser, country },
     });
   } catch {
     // Silently fail — tracking should never block the user

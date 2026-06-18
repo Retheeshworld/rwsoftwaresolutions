@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -18,6 +18,9 @@ import {
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RequireAuth } from "@/components/RequireAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+
 
 export const Route = createFileRoute("/admin/analytics")({
   head: () => ({ meta: [{ title: "Analytics — RW Admin" }] }),
@@ -38,13 +41,24 @@ const COLORS = [
   "var(--color-chart-5)",
 ];
 
+type RawLead = {
+  event_type: string;
+  created_at: string;
+  device: string;
+  browser: string;
+  country: string;
+};
+
 function AnalyticsPage() {
   const [revenueByMonth, setRevenueByMonth] = useState<{ month: string; revenue: number; enrollments: number }[]>([]);
   const [growth, setGrowth] = useState<{ month: string; students: number }[]>([]);
   const [coursePop, setCoursePop] = useState<{ name: string; value: number }[]>([]);
   const [appStatus, setAppStatus] = useState<{ name: string; value: number }[]>([]);
-  const [leadEvents, setLeadEvents] = useState<{ month: string; whatsapp: number; chat: number; contact: number }[]>([]);
-  const [leadTotals, setLeadTotals] = useState<{ name: string; value: number }[]>([]);
+  const [rawLeads, setRawLeads] = useState<RawLead[]>([]);
+
+  const [deviceFilter, setDeviceFilter] = useState<string>("all");
+  const [browserFilter, setBrowserFilter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
 
   useEffect(() => {
     const load = async () => {
@@ -54,7 +68,7 @@ function AnalyticsPage() {
           .select("amount_paid, enrolled_at, course:courses(title)"),
         supabase.from("profiles").select("created_at"),
         supabase.from("internship_applications").select("status"),
-        supabase.from("lead_events").select("event_type, created_at"),
+        supabase.from("lead_events").select("event_type, created_at, metadata"),
       ]);
 
       // 12-month revenue + enrollments
@@ -114,37 +128,68 @@ function AnalyticsPage() {
       });
       setAppStatus([...sCounts.entries()].map(([name, value]) => ({ name, value })));
 
-      // Lead events by month
-      const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
-      for (let i = 11; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - i);
-        lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
-      }
-      const lTotals = new Map<string, number>();
-      (leads ?? []).forEach((l: any) => {
-        const d = new Date(l.created_at);
-        const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
-        if (diff >= 0 && diff < 12) {
-          const bucket = lMonths[11 - diff];
-          if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
-          else if (l.event_type === "chat_open") bucket.chat += 1;
-          else if (l.event_type === "contact_submit") bucket.contact += 1;
-        }
-        lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+      // Raw leads with parsed audience attributes
+      const raw: RawLead[] = (leads ?? []).map((l: any) => {
+        const m = (l.metadata ?? {}) as Record<string, unknown>;
+        return {
+          event_type: l.event_type,
+          created_at: l.created_at,
+          device: (m.device as string) || "Unknown",
+          browser: (m.browser as string) || "Unknown",
+          country: (m.country as string) || "Unknown",
+        };
       });
-      setLeadEvents(lMonths);
-      setLeadTotals(
-        [...lTotals.entries()]
-          .map(([name, value]) => ({
-            name: name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
-            value,
-          }))
-          .sort((a, b) => b.value - a.value),
-      );
+      setRawLeads(raw);
     };
     load();
   }, []);
+
+  const deviceOptions = useMemo(() => uniq(rawLeads.map((l) => l.device)), [rawLeads]);
+  const browserOptions = useMemo(() => uniq(rawLeads.map((l) => l.browser)), [rawLeads]);
+  const countryOptions = useMemo(() => uniq(rawLeads.map((l) => l.country)), [rawLeads]);
+
+  const filteredLeads = useMemo(
+    () =>
+      rawLeads.filter(
+        (l) =>
+          (deviceFilter === "all" || l.device === deviceFilter) &&
+          (browserFilter === "all" || l.browser === browserFilter) &&
+          (countryFilter === "all" || l.country === countryFilter),
+      ),
+    [rawLeads, deviceFilter, browserFilter, countryFilter],
+  );
+
+  const { leadEvents, leadTotals } = useMemo(() => {
+    const lMonths: { month: string; whatsapp: number; chat: number; contact: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      lMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), whatsapp: 0, chat: 0, contact: 0 });
+    }
+    const lTotals = new Map<string, number>();
+    filteredLeads.forEach((l) => {
+      const d = new Date(l.created_at);
+      const diff = (new Date().getFullYear() - d.getFullYear()) * 12 + (new Date().getMonth() - d.getMonth());
+      if (diff >= 0 && diff < 12) {
+        const bucket = lMonths[11 - diff];
+        if (l.event_type === "whatsapp_click") bucket.whatsapp += 1;
+        else if (l.event_type === "chat_open") bucket.chat += 1;
+        else if (l.event_type === "contact_submit") bucket.contact += 1;
+      }
+      lTotals.set(l.event_type, (lTotals.get(l.event_type) ?? 0) + 1);
+    });
+    return {
+      leadEvents: lMonths,
+      leadTotals: [...lTotals.entries()]
+        .map(([name, value]) => ({
+          name:
+            name === "whatsapp_click" ? "WhatsApp" : name === "chat_open" ? "Chat" : name === "contact_submit" ? "Contact" : name,
+          value,
+        }))
+        .sort((a, b) => b.value - a.value),
+    };
+  }, [filteredLeads]);
+
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6">
@@ -221,10 +266,38 @@ function AnalyticsPage() {
         </ChartCard>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
-        <p className="mt-1 text-sm text-muted-foreground">WhatsApp clicks, chat opens, and contact submissions.</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Lead Conversions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            WhatsApp clicks, chat opens, and contact submissions.
+            {filteredLeads.length !== rawLeads.length && (
+              <span className="ml-1 text-foreground">
+                Showing {filteredLeads.length} of {rawLeads.length} events.
+              </span>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <FilterSelect label="Device" value={deviceFilter} onChange={setDeviceFilter} options={deviceOptions} />
+          <FilterSelect label="Browser" value={browserFilter} onChange={setBrowserFilter} options={browserOptions} />
+          <FilterSelect label="Country" value={countryFilter} onChange={setCountryFilter} options={countryOptions} />
+          {(deviceFilter !== "all" || browserFilter !== "all" || countryFilter !== "all") && (
+            <button
+              type="button"
+              onClick={() => {
+                setDeviceFilter("all");
+                setBrowserFilter("all");
+                setCountryFilter("all");
+              }}
+              className="rounded-md border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              Reset
+            </button>
+          )}
+        </div>
       </div>
+
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartCard title="Lead events trend" subtitle="Last 12 months">
@@ -280,5 +353,37 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle: str
       </div>
       {children}
     </div>
+  );
+}
+
+function uniq(arr: string[]): string[] {
+  return [...new Set(arr.filter(Boolean))].sort();
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-9 w-[150px] text-xs">
+        <SelectValue placeholder={label} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All {label.toLowerCase()}s</SelectItem>
+        {options.map((opt) => (
+          <SelectItem key={opt} value={opt}>
+            {opt}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
