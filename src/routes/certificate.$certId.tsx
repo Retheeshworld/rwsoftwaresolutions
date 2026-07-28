@@ -31,27 +31,28 @@ function CertificatePage() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const { data } = await supabase
-        .from("certificates")
-        .select("id, certificate_code, issued_at, user_id, course:courses(title)")
-        .eq("id", certId)
-        .maybeSingle();
-      if (!data) {
+      const client = supabase as unknown as {
+        rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+      };
+      const { data } = await client.rpc("get_certificate_by_id", { _id: certId });
+      const row = (data as Array<{
+        id: string;
+        certificate_code: string;
+        issued_at: string;
+        course_title: string | null;
+        student_name: string | null;
+      }> | null)?.[0];
+      if (!row) {
         if (active) setLoading(false);
         return;
       }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", data.user_id)
-        .maybeSingle();
       if (active) {
         setCert({
-          id: data.id,
-          certificate_code: data.certificate_code,
-          issued_at: data.issued_at,
-          course: data.course as { title: string } | null,
-          profile_name: profile?.full_name ?? null,
+          id: row.id,
+          certificate_code: row.certificate_code,
+          issued_at: row.issued_at,
+          course: row.course_title ? { title: row.course_title } : null,
+          profile_name: row.student_name,
         });
         setLoading(false);
       }
