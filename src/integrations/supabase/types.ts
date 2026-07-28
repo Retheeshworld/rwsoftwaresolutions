@@ -650,6 +650,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_certificate_by_id: {
+        Args: { _id: string }
+        Returns: {
+          certificate_code: string
+          course_title: string
+          id: string
+          issued_at: string
+          student_name: string
+        }[]
+      }
       get_quiz_questions: {
         Args: { _quiz_id: string }
         Returns: {
@@ -680,6 +690,16 @@ export type Database = {
       try_issue_certificate: {
         Args: { _course: string; _user: string }
         Returns: undefined
+      }
+      verify_certificate_by_code: {
+        Args: { _code: string }
+        Returns: {
+          certificate_code: string
+          course_title: string
+          id: string
+          issued_at: string
+          student_name: string
+        }[]
       }
     }
     Enums: {
