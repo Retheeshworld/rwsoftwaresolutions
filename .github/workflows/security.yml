@@ -1,0 +1,46 @@
+name: Security Audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    name: npm audit (block on Critical)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Fails (exit 1) if any Critical-severity vulnerability is found,
+      # which blocks the PR when this check is marked as required.
+      - name: Audit production & dev dependencies
+        run: npm audit --audit-level=critical
+
+  # Optional Snyk scan. To enable:
+  #   1. Add SNYK_TOKEN as a repo secret (https://app.snyk.io/account)
+  #   2. Set the repo variable SNYK_ENABLED = true
+  snyk:
+    name: Snyk scan (optional)
+    runs-on: ubuntu-latest
+    if: ${{ vars.SNYK_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=critical --all-projects
