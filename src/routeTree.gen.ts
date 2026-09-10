@@ -14,6 +14,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InternshipCertificateRouteImport } from './routes/internship-certificate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -32,6 +33,7 @@ import { Route as AdminClientsRouteImport } from './routes/admin.clients'
 import { Route as AdminCertificatesRouteImport } from './routes/admin.certificates'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as LearnCourseIdLessonIdRouteImport } from './routes/learn.$courseId.$lessonId'
+import { Route as CertificateInternshipIdRouteImport } from './routes/certificate.internship.$id'
 import { Route as AdminCoursesCourseIdRouteImport } from './routes/admin.courses.$courseId'
 import { Route as LearnCourseIdQuizQuizIdRouteImport } from './routes/learn.$courseId.quiz.$quizId'
 import { Route as AdminCoursesCourseIdQuizQuizIdRouteImport } from './routes/admin.courses.$courseId.quiz.$quizId'
@@ -59,6 +61,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InternshipCertificateRoute = InternshipCertificateRouteImport.update({
+  id: '/internship-certificate',
+  path: '/internship-certificate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -151,6 +158,11 @@ const LearnCourseIdLessonIdRoute = LearnCourseIdLessonIdRouteImport.update({
   path: '/learn/$courseId/$lessonId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CertificateInternshipIdRoute = CertificateInternshipIdRouteImport.update({
+  id: '/certificate/internship/$id',
+  path: '/certificate/internship/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCoursesCourseIdRoute = AdminCoursesCourseIdRouteImport.update({
   id: '/$courseId',
   path: '/$courseId',
@@ -176,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
+  '/internship-certificate': typeof InternshipCertificateRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
@@ -192,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
+  '/certificate/internship/$id': typeof CertificateInternshipIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
   '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
   '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
@@ -204,6 +218,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
+  '/internship-certificate': typeof InternshipCertificateRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
@@ -220,6 +235,7 @@ export interface FileRoutesByTo {
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
+  '/certificate/internship/$id': typeof CertificateInternshipIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
   '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
   '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
@@ -233,6 +249,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
+  '/internship-certificate': typeof InternshipCertificateRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/services': typeof ServicesRoute
@@ -249,6 +266,7 @@ export interface FileRoutesById {
   '/admin/social': typeof AdminSocialRoute
   '/certificate/$certId': typeof CertificateCertIdRoute
   '/admin/courses/$courseId': typeof AdminCoursesCourseIdRouteWithChildren
+  '/certificate/internship/$id': typeof CertificateInternshipIdRoute
   '/learn/$courseId/$lessonId': typeof LearnCourseIdLessonIdRoute
   '/learn/$courseId/quiz/$quizId': typeof LearnCourseIdQuizQuizIdRoute
   '/admin/courses/$courseId/quiz/$quizId': typeof AdminCoursesCourseIdQuizQuizIdRoute
@@ -263,6 +281,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/courses'
     | '/dashboard'
+    | '/internship-certificate'
     | '/login'
     | '/portfolio'
     | '/services'
@@ -279,6 +298,7 @@ export interface FileRouteTypes {
     | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
+    | '/certificate/internship/$id'
     | '/learn/$courseId/$lessonId'
     | '/learn/$courseId/quiz/$quizId'
     | '/admin/courses/$courseId/quiz/$quizId'
@@ -291,6 +311,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/courses'
     | '/dashboard'
+    | '/internship-certificate'
     | '/login'
     | '/portfolio'
     | '/services'
@@ -307,6 +328,7 @@ export interface FileRouteTypes {
     | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
+    | '/certificate/internship/$id'
     | '/learn/$courseId/$lessonId'
     | '/learn/$courseId/quiz/$quizId'
     | '/admin/courses/$courseId/quiz/$quizId'
@@ -319,6 +341,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/courses'
     | '/dashboard'
+    | '/internship-certificate'
     | '/login'
     | '/portfolio'
     | '/services'
@@ -335,6 +358,7 @@ export interface FileRouteTypes {
     | '/admin/social'
     | '/certificate/$certId'
     | '/admin/courses/$courseId'
+    | '/certificate/internship/$id'
     | '/learn/$courseId/$lessonId'
     | '/learn/$courseId/quiz/$quizId'
     | '/admin/courses/$courseId/quiz/$quizId'
@@ -348,12 +372,14 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
   DashboardRoute: typeof DashboardRoute
+  InternshipCertificateRoute: typeof InternshipCertificateRoute
   LoginRoute: typeof LoginRoute
   PortfolioRoute: typeof PortfolioRoute
   ServicesRoute: typeof ServicesRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CertificateCertIdRoute: typeof CertificateCertIdRoute
+  CertificateInternshipIdRoute: typeof CertificateInternshipIdRoute
   LearnCourseIdLessonIdRoute: typeof LearnCourseIdLessonIdRoute
   LearnCourseIdQuizQuizIdRoute: typeof LearnCourseIdQuizQuizIdRoute
 }
@@ -393,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/internship-certificate': {
+      id: '/internship-certificate'
+      path: '/internship-certificate'
+      fullPath: '/internship-certificate'
+      preLoaderRoute: typeof InternshipCertificateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -521,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnCourseIdLessonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/certificate/internship/$id': {
+      id: '/certificate/internship/$id'
+      path: '/certificate/internship/$id'
+      fullPath: '/certificate/internship/$id'
+      preLoaderRoute: typeof CertificateInternshipIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/courses/$courseId': {
       id: '/admin/courses/$courseId'
       path: '/$courseId'
@@ -602,12 +642,14 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
   DashboardRoute: DashboardRoute,
+  InternshipCertificateRoute: InternshipCertificateRoute,
   LoginRoute: LoginRoute,
   PortfolioRoute: PortfolioRoute,
   ServicesRoute: ServicesRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CertificateCertIdRoute: CertificateCertIdRoute,
+  CertificateInternshipIdRoute: CertificateInternshipIdRoute,
   LearnCourseIdLessonIdRoute: LearnCourseIdLessonIdRoute,
   LearnCourseIdQuizQuizIdRoute: LearnCourseIdQuizQuizIdRoute,
 }
