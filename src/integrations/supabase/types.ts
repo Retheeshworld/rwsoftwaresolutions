@@ -308,6 +308,66 @@ export type Database = {
         }
         Relationships: []
       }
+      internship_certificates: {
+        Row: {
+          amount: number
+          certificate_code: string | null
+          college_name: string
+          created_at: string
+          domain: string
+          duration: string
+          email: string | null
+          full_name: string
+          id: string
+          issued_at: string | null
+          payment_method: string
+          payment_reference: string | null
+          payment_status: string
+          phone: string | null
+          roll_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          certificate_code?: string | null
+          college_name: string
+          created_at?: string
+          domain: string
+          duration: string
+          email?: string | null
+          full_name: string
+          id?: string
+          issued_at?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          payment_status?: string
+          phone?: string | null
+          roll_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          certificate_code?: string | null
+          college_name?: string
+          created_at?: string
+          domain?: string
+          duration?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          issued_at?: string | null
+          payment_method?: string
+          payment_reference?: string | null
+          payment_status?: string
+          phone?: string | null
+          roll_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lead_events: {
         Row: {
           created_at: string | null
@@ -660,6 +720,19 @@ export type Database = {
           student_name: string
         }[]
       }
+      get_internship_certificate: {
+        Args: { _id: string }
+        Returns: {
+          certificate_code: string
+          college_name: string
+          domain: string
+          duration: string
+          full_name: string
+          id: string
+          issued_at: string
+          roll_number: string
+        }[]
+      }
       get_quiz_questions: {
         Args: { _quiz_id: string }
         Returns: {
@@ -699,6 +772,19 @@ export type Database = {
           id: string
           issued_at: string
           student_name: string
+        }[]
+      }
+      verify_internship_certificate: {
+        Args: { _code: string }
+        Returns: {
+          certificate_code: string
+          college_name: string
+          domain: string
+          duration: string
+          full_name: string
+          id: string
+          issued_at: string
+          roll_number: string
         }[]
       }
     }
